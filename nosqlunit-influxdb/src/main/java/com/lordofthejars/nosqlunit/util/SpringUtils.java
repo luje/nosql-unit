@@ -1,10 +1,8 @@
 package com.lordofthejars.nosqlunit.util;
+
 import org.springframework.context.ApplicationContext;
 
 import java.util.Map;
-
-import static ch.lambdaj.collection.LambdaCollections.with;
-import static org.hamcrest.CoreMatchers.anything;
 
 
 public class SpringUtils
@@ -24,7 +22,7 @@ public class SpringUtils
 			beansOfType = applicationContext.getBeansOfType(aClass);
 			if (beansOfType != null && beansOfType.size() > 0)
 			{
-				return with(beansOfType).values().first(anything());
+				return beansOfType.values().stream().findFirst().get();
 			}
 			applicationContext = applicationContext.getParent();
 		}

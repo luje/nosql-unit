@@ -1,18 +1,7 @@
 package com.lordofthejars.nosqlunit.mongodb.integration;
 
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-import static ch.lambdaj.Lambda.selectFirst;
-import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManagerBuilder.newManagedMongoDbLifecycle;
-import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetBuilder.replicaSet;
-import static com.lordofthejars.nosqlunit.mongodb.shard.ManagedMongosLifecycleManagerBuilder.newManagedMongosLifecycle;
-import static com.lordofthejars.nosqlunit.mongodb.shard.ShardedGroupBuilder.shardedGroup;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
-import java.net.UnknownHostException;
-import java.util.Arrays;
-
+import com.lordofthejars.nosqlunit.mongodb.MongoDbCommands;
+import com.lordofthejars.nosqlunit.mongodb.shard.ShardedManagedMongoDb;
 import com.mongodb.*;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -21,13 +10,21 @@ import org.junit.AfterClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import com.lordofthejars.nosqlunit.mongodb.MongoDbCommands;
-import com.lordofthejars.nosqlunit.mongodb.shard.ShardedManagedMongoDb;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Objects;
+
+import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManagerBuilder.newManagedMongoDbLifecycle;
+import static com.lordofthejars.nosqlunit.mongodb.replicaset.ReplicaSetBuilder.replicaSet;
+import static com.lordofthejars.nosqlunit.mongodb.shard.ManagedMongosLifecycleManagerBuilder.newManagedMongosLifecycle;
+import static com.lordofthejars.nosqlunit.mongodb.shard.ShardedGroupBuilder.shardedGroup;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class WhenReplicaSetShardingIsRequired {
 
 	static {
-		System.setProperty("MONGO_HOME", "/opt/mongo");
+		System.setProperty("MONGO_HOME", "d:\\opt\\mongo");
 	}
 
 	@ClassRule
@@ -63,12 +60,14 @@ public class WhenReplicaSetShardingIsRequired {
 		
 		assertThat((String)listShards.get("serverUsed"), is("localhost/127.0.0.1:27017"));
 		BasicDBList shards = (BasicDBList) listShards.get("shards");
-		
-		DBObject replicaSet1 = selectFirst(shards, having(on(DBObject.class).get("_id"), is("rs-test-2")));
+
+        //selectFirst(shards, having(on(DBObject.class).get("_id"), is("rs-test-2")))
+		DBObject replicaSet1 = shards.stream().map(it -> (DBObject) it).filter(it -> Objects.equals(it.get("_id"), "rs-test-2")).findFirst().get();
 		
 		assertThat(replicaSet1, is(createShardDbObject("rs-test-2", "rs-test-2/localhost:27009")));
-		
-		DBObject replicaSet2 = selectFirst(shards, having(on(DBObject.class).get("_id"), is("rs-test-1")));
+
+        //selectFirst(shards, having(on(DBObject.class).get("_id"), is("rs-test-1")));
+		DBObject replicaSet2 = shards.stream().map(it -> (DBObject) it).filter(it -> Objects.equals(it.get("_id"), "rs-test-1")).findFirst().get();
 		
 		assertThat(replicaSet2, is(createShardDbObject("rs-test-1", "rs-test-1/localhost:27007")));
 		

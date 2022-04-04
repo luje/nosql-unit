@@ -1,6 +1,5 @@
 package com.lordofthejars.nosqlunit.neo4j;
 
-import static ch.lambdaj.collection.LambdaCollections.with;
 import static org.hamcrest.CoreMatchers.anything;
 
 import java.util.Map;
@@ -40,7 +39,7 @@ class SpringGraphDatabaseServiceNeo4jRule extends Neo4jRule {
 					"At least one GraphDatabaseService instance should be defined into Spring Application Context.");
 		}
 		
-		GraphDatabaseService graphDatabaseService = with(beansOfType).values().first(anything());
+		GraphDatabaseService graphDatabaseService = beansOfType.values().stream().findFirst().orElse(null);
 
 		if (graphDatabaseService == null) {
 			throw new IllegalArgumentException(

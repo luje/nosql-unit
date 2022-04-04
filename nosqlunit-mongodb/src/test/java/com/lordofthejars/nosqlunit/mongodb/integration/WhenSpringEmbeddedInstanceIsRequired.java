@@ -6,7 +6,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="embedded-mongo-spring-definition.xml")
+@ContextConfiguration(classes = SpringEmbeddedInstanceBase.EmbeddedMongoConfiguration.class)
 public class WhenSpringEmbeddedInstanceIsRequired extends SpringEmbeddedInstanceBase{
 
 	@Test

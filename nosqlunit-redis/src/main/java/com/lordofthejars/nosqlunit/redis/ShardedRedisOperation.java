@@ -1,16 +1,14 @@
 package com.lordofthejars.nosqlunit.redis;
 
-import static ch.lambdaj.Lambda.forEach;
-
-import java.io.InputStream;
-import java.util.Collection;
-
+import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
+import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
+import redis.clients.jedis.BinaryJedis;
 import redis.clients.jedis.BinaryJedisCommands;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.ShardedJedis;
 
-import com.lordofthejars.nosqlunit.core.AbstractCustomizableDatabaseOperation;
-import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
+import java.io.InputStream;
+import java.util.Collection;
 
 public class ShardedRedisOperation extends AbstractCustomizableDatabaseOperation<RedisConnectionCallback, ShardedJedis> {
 
@@ -53,7 +51,8 @@ public class ShardedRedisOperation extends AbstractCustomizableDatabaseOperation
 
 	@Override
 	public void deleteAll() {
-		forEach(shardedJedis.getAllShards()).flushAll();
+        shardedJedis.getAllShards()
+                .forEach(BinaryJedis::flushAll);
 	}
 
 	@Override

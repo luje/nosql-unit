@@ -28,7 +28,7 @@ import com.mongodb.Mongo;
 public class WhenYouFindAllBooksInShards {
 
 	static {
-		System.setProperty("MONGO_HOME", "/opt/mongo");
+		System.setProperty("MONGO_HOME", "d:\\opt\\mongo");
 	}
 
 	@ClassRule

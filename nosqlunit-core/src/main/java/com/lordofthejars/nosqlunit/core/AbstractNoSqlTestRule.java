@@ -11,10 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import static ch.lambdaj.Lambda.*;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 public abstract class AbstractNoSqlTestRule implements MethodRule {
 
@@ -315,12 +313,11 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 
             private SelectiveMatcher findSelectiveMatcherByConnectionIdentifier(
                     SelectiveMatcher[] selectiveMatchers) {
-                return selectFirst(
-                        selectiveMatchers,
-                        having(on(SelectiveMatcher.class).identifier(),
-                                equalTo(identifier)).and(
-                                having(on(SelectiveMatcher.class).location(),
-                                        notNullValue())));
+                return Stream.of(selectiveMatchers)
+                        .filter(it -> Objects.equals(identifier, it.identifier()))
+                        .filter(it -> Objects.nonNull(it.identifier()))
+                        .findFirst()
+                        .get();
             }
 
             private InputStream loadExpectedResultFromDefaultLocation(

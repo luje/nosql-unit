@@ -1,14 +1,10 @@
 package com.lordofthejars.nosqlunit.redis.replication;
 
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-import static ch.lambdaj.Lambda.selectFirst;
-import static org.hamcrest.CoreMatchers.is;
+import com.lordofthejars.nosqlunit.redis.ManagedRedisLifecycleManager;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import com.lordofthejars.nosqlunit.redis.ManagedRedisLifecycleManager;
+import java.util.Objects;
 
 public class ReplicationGroup {
 
@@ -37,11 +33,12 @@ public class ReplicationGroup {
 		if(this.master.getPort() == port && !this.master.isReady()) {
 			return this.master;
 		}
-		
-		return selectFirst(
-				this.slaveServers,
-				having(on(ManagedRedisLifecycleManager.class).getPort(),
-						is(port)).and(having(on(ManagedRedisLifecycleManager.class).isReady(), is(false))));
+
+        return this.slaveServers.stream()
+                .filter(it -> Objects.equals(port, it.getPort()))
+                .filter(it -> Objects.equals(false, it.isReady()))
+                .findFirst()
+                .orElse(null);
 	}
 	
 	public ManagedRedisLifecycleManager getStartedServer(int port) {
@@ -49,12 +46,12 @@ public class ReplicationGroup {
 		if(this.master.getPort() == port && this.master.isReady()) {
 			return this.master;
 		}
-		
-		
-		return selectFirst(
-				this.slaveServers,
-				having(on(ManagedRedisLifecycleManager.class).getPort(),
-						is(port)).and(having(on(ManagedRedisLifecycleManager.class).isReady(), is(true))));
+
+        return this.slaveServers.stream()
+                .filter(it -> Objects.equals(port, it.getPort()))
+                .filter(it -> Objects.equals(true, it.isReady()))
+                .findFirst()
+                .orElse(null);
 	}
 	
 	public int numberOfStartedServers() {

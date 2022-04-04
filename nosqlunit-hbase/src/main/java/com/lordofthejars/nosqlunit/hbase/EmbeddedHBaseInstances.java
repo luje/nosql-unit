@@ -1,12 +1,9 @@
 package com.lordofthejars.nosqlunit.hbase;
 
-import static ch.lambdaj.collection.LambdaCollections.with;
-import static org.hamcrest.CoreMatchers.anything;
+import org.apache.hadoop.conf.Configuration;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.hadoop.conf.Configuration;
 
 public class EmbeddedHBaseInstances {
 
@@ -38,7 +35,9 @@ public class EmbeddedHBaseInstances {
 	}
 	
 	public Configuration getDefaultConfiguration() {
-		return with(this.instances).values().first(anything());
+        return this.instances.values().stream()
+                .findFirst()
+                .orElse(null);
 	}
 	
 }

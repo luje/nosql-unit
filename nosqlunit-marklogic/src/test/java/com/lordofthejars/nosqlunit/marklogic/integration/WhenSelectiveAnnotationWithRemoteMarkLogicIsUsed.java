@@ -20,7 +20,6 @@ import org.junit.runner.RunWith;
 
 import java.util.Optional;
 
-import static ch.lambdaj.function.matcher.OrMatcher.or;
 import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogicLifecycleManagerBuilder.newManagedMarkLogicLifecycle;
 import static com.lordofthejars.nosqlunit.marklogic.RemoteMarkLogicConfigurationBuilder.remoteMarkLogic;
 import static com.lordofthejars.nosqlunit.marklogic.ml.DefaultMarkLogic.close;
@@ -30,6 +29,7 @@ import static com.lordofthejars.nosqlunit.marklogic.ml.MarkLogicREST.createRESTS
 import static com.lordofthejars.nosqlunit.marklogic.ml.MarkLogicREST.deleteRESTServerWithDB;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
+import static org.mockito.AdditionalMatchers.or;
 
 /**
  * Uses a remote MarkLogic instance for testing (which is dockerized, having container name 'marklogic').

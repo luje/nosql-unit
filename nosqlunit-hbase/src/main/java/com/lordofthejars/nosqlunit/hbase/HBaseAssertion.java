@@ -1,37 +1,19 @@
 package com.lordofthejars.nosqlunit.hbase;
 
-import static ch.lambdaj.Lambda.selectFirst;
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-import static org.hamcrest.CoreMatchers.equalTo;
+import com.lordofthejars.nosqlunit.core.FailureHandler;
+import com.lordofthejars.nosqlunit.hbase.model.*;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.KeyValue;
+import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.client.coprocessor.AggregationClient;
+import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.KeyValue;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.apache.hadoop.hbase.client.HConnection;
-import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.client.coprocessor.AggregationClient;
-
-import ch.lambdaj.function.convert.Converter;
-
-import com.lordofthejars.nosqlunit.core.FailureHandler;
-import com.lordofthejars.nosqlunit.hbase.model.DataSetParser;
-import com.lordofthejars.nosqlunit.hbase.model.JsonDataSetParser;
-import com.lordofthejars.nosqlunit.hbase.model.ParsedColumnFamilyModel;
-import com.lordofthejars.nosqlunit.hbase.model.ParsedColumnModel;
-import com.lordofthejars.nosqlunit.hbase.model.ParsedDataModel;
-import com.lordofthejars.nosqlunit.hbase.model.ParsedRowModel;
-import org.apache.hadoop.hbase.util.Bytes;
 
 public class HBaseAssertion {
 
@@ -198,27 +180,21 @@ public class HBaseAssertion {
 		return expectedTableName;
 	}
 
-	private static String getValue(KeyValue[] raws) {
-		return toStringValue().convert(raws[0].getValue());
-	}
+    private static String getValue(KeyValue[] raws) {
+        return toStringValue(raws[0].getValue());
+    }
 
-	private static String getName(KeyValue[] raws) {
-		return toStringValue().convert(raws[0].getQualifier());
-	}
+    private static String getName(KeyValue[] raws) {
+        return toStringValue(raws[0].getQualifier());
+    }
 
-	private static Converter<byte[], String> toStringValue() {
-		return new Converter<byte[], String>() {
-
-			@Override
-			public String convert(byte[] from) {
-				try {
-					return new String(from, "UTF-8");
-				} catch (UnsupportedEncodingException e) {
-					throw new IllegalArgumentException(e);
-				}
-			}
-		};
-	}
+    private static String toStringValue(byte[] from) {
+        try {
+            return new String(from, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 
 	private static long countNumberOfRows(HConnection connection, byte[] tableName, byte[] columnFamily)
 			throws Throwable {

@@ -28,7 +28,7 @@ public class WhenReplicaSetConfigurationIsRequired {
         String serializedConfiguration = configuration.toJson();
         assertThat(
                 serializedConfiguration,
-                is("{ \"_id\" : \"rs0\" , \"version\" : 1 , \"members\" : [ { \"_id\" : 0 , \"host\" : \"localhost:21017\"}]}"));
+                is("{\"_id\": \"rs0\", \"version\": 1, \"members\": [{\"_id\": 0, \"host\": \"localhost:21017\"}]}"));
     }
 
     @Test
@@ -44,7 +44,7 @@ public class WhenReplicaSetConfigurationIsRequired {
         String serializedConfiguration = configuration.toJson();
         assertThat(
                 serializedConfiguration,
-                is("{ \"_id\" : \"rs0\" , \"version\" : 1 , \"members\" : [ { \"_id\" : 0 , \"host\" : \"localhost:21017\" , \"priority\" : 0}]}"));
+                is("{\"_id\": \"rs0\", \"version\": 1, \"members\": [{\"_id\": 0, \"host\": \"localhost:21017\", \"priority\": 0}]}"));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class WhenReplicaSetConfigurationIsRequired {
 
         assertThat(
                 serializedConfiguration,
-                is("{ \"_id\" : \"rs0\" , \"version\" : 1 , \"members\" : [ { \"_id\" : 0 , \"host\" : \"localhost:21017\" , \"priority\" : 0 , \"hidden\" : true}]}"));
+                is("{\"_id\": \"rs0\", \"version\": 1, \"members\": [{\"_id\": 0, \"host\": \"localhost:21017\", \"priority\": 0, \"hidden\": true}]}"));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class WhenReplicaSetConfigurationIsRequired {
 
         assertThat(
                 serializedConfiguration,
-                is("{ \"_id\" : \"rs0\" , \"version\" : 1 , \"members\" : [ { \"_id\" : 0 , \"host\" : \"localhost:21017\" , \"arbiterOnly\" : true}]}"));
+                is("{\"_id\": \"rs0\", \"version\": 1, \"members\": [{\"_id\": 0, \"host\": \"localhost:21017\", \"arbiterOnly\": true}]}"));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class WhenReplicaSetConfigurationIsRequired {
 
         assertThat(
                 serializedConfiguration,
-                is("{ \"_id\" : \"rs0\" , \"version\" : 1 , \"members\" : [ { \"_id\" : 0 , \"host\" : \"localhost:21017\" , \"votes\" : 0}]}"));
+                is("{\"_id\": \"rs0\", \"version\": 1, \"members\": [{\"_id\": 0, \"host\": \"localhost:21017\", \"votes\": 0}]}"));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class WhenReplicaSetConfigurationIsRequired {
 
         assertThat(
                 serializedConfiguration,
-                is("{ \"_id\" : \"rs0\" , \"version\" : 1 , \"members\" : [ { \"_id\" : 0 , \"host\" : \"localhost:21017\" , \"priority\" : 0 , \"slaveDelay\" : 1200}]}"));
+                is("{\"_id\": \"rs0\", \"version\": 1, \"members\": [{\"_id\": 0, \"host\": \"localhost:21017\", \"priority\": 0, \"slaveDelay\": 1200}]}"));
     }
 
     @Test
@@ -131,7 +131,7 @@ public class WhenReplicaSetConfigurationIsRequired {
 
         assertThat(
                 serializedConfiguration,
-                is("{ \"_id\" : \"rs0\" , \"version\" : 1 , \"members\" : [ { \"_id\" : 0 , \"host\" : \"localhost:21017\" , \"arbiterOnly\" : true , \"buildIndexes\" : true , \"tags\" : { \"prop1\" : \"val1\" , \"prop2\" : \"val2\"}}]}"));
+                is("{\"_id\": \"rs0\", \"version\": 1, \"members\": [{\"_id\": 0, \"host\": \"localhost:21017\", \"arbiterOnly\": true, \"buildIndexes\": true, \"tags\": {\"prop1\": \"val1\", \"prop2\": \"val2\"}}]}"));
     }
 
     @Test
@@ -148,7 +148,7 @@ public class WhenReplicaSetConfigurationIsRequired {
 
         assertThat(
                 serializedConfiguration,
-                is("{ \"_id\" : \"rs0\" , \"version\" : 1 , \"members\" : [ { \"_id\" : 0 , \"host\" : \"localhost:21017\"}] , \"settings\" : { \"getLastErrorModes\" : { \"DRSafe\" : { \"region\" : 2}}}}"));
+                is("{\"_id\": \"rs0\", \"version\": 1, \"members\": [{\"_id\": 0, \"host\": \"localhost:21017\"}], \"settings\": {\"getLastErrorModes\": {\"DRSafe\": {\"region\": 2}}}}"));
 
     }
 
@@ -170,7 +170,7 @@ public class WhenReplicaSetConfigurationIsRequired {
 
         assertThat(
                 serializedConfiguration,
-                is("{ \"_id\" : \"rs0\" , \"version\" : 1 , \"members\" : [ { \"_id\" : 0 , \"host\" : \"localhost:21017\"} , { \"_id\" : 1 , \"host\" : \"localhost:21018\" , \"priority\" : 0}]}"));
+                is("{\"_id\": \"rs0\", \"version\": 1, \"members\": [{\"_id\": 0, \"host\": \"localhost:21017\"}, {\"_id\": 1, \"host\": \"localhost:21018\", \"priority\": 0}]}"));
 
     }
 

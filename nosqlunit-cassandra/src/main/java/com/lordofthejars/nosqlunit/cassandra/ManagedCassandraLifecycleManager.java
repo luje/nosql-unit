@@ -1,18 +1,12 @@
 package com.lordofthejars.nosqlunit.cassandra;
 
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-import static ch.lambdaj.Lambda.selectUnique;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 import me.prettyprint.cassandra.service.CassandraHost;
@@ -179,7 +173,11 @@ public class ManagedCassandraLifecycleManager extends AbstractLifecycleManager {
 	}
 
 	private File getJammJar(File[] cassandraJars) {
-		File jammJar = selectUnique(cassandraJars, having(on(File.class).getName(), startsWith("jamm")));
+		File jammJar = Arrays.stream(cassandraJars)
+                .filter(it -> it.getName().startsWith("jamm"))
+                .findFirst()
+                .get();
+
 		return jammJar;
 	}
 

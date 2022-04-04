@@ -1,18 +1,11 @@
 package com.lordofthejars.nosqlunit.mongodb.integration;
 
 
-import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
-import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-
-import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
+import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb;
+import com.lordofthejars.nosqlunit.mongodb.MongoDbConfiguration;
+import com.lordofthejars.nosqlunit.mongodb.MongoOperation;
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.CreateCollectionOptions;
@@ -22,12 +15,18 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
-import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb;
-import com.lordofthejars.nosqlunit.mongodb.MongoDbConfiguration;
-import com.lordofthejars.nosqlunit.mongodb.MongoOperation;
-import com.mongodb.BasicDBObject;
-import com.mongodb.MongoException;
+import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
+import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class WhenExpectedDataShouldBeCompared {
 
@@ -165,7 +164,7 @@ public class WhenExpectedDataShouldBeCompared {
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Soto\"}]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
-			assertThat(e.getMessage(), is("Object # { \"name\" : \"Soto\"} # is not found into collection [col1]"));
+			assertThat(e.getMessage(), equalToCompressingWhiteSpace("Object # Document{{name=Soto}} # is not found into collection [col1]"));
 		}
 		
 	}
@@ -206,7 +205,7 @@ public class WhenExpectedDataShouldBeCompared {
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\"}]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
-			assertThat(e.getMessage(), is("Expected collection names are [col1] but insert collection names are [col1, col3]"));
+			assertThat(e.getMessage(), equalToCompressingWhiteSpace("Expected collection names are [col1] but insert collection names are [col3, col1]"));
 		}
 		
 	}
@@ -233,7 +232,7 @@ public class WhenExpectedDataShouldBeCompared {
 			//Expected with two elements
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\", \"surname\":\"Soto\"}]}".getBytes("UTF-8")));
 		}catch(NoSqlAssertionError e) {
-			assertThat(e.getMessage(), is("Object # { \"name\" : \"Alex\" , \"surname\" : \"Soto\"} # is not found into collection [col1]"));
+			assertThat(e.getMessage(), equalToCompressingWhiteSpace("Object # Document{{name=Alex, surname=Soto}} # is not found into collection [col1]"));
 		}
 		
 	}
@@ -248,7 +247,7 @@ public class WhenExpectedDataShouldBeCompared {
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\", \"surname\":\"Soto\"}]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
-			assertThat(e.getMessage(), is("Object # { \"name\" : \"Alex\" , \"surname\" : \"Soto\"} # is not found into collection [col1]"));
+			assertThat(e.getMessage(), equalToCompressingWhiteSpace("Object # Document{{name=Alex, surname=Soto}} # is not found into collection [col1]"));
 		}
 		
 	}
@@ -263,7 +262,7 @@ public class WhenExpectedDataShouldBeCompared {
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Alex\"}]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
-			assertThat(e.getMessage(), is("Expected DbObject and insert DbObject have different keys: Expected: [name] Inserted: [name, surname]"));
+			assertThat(e.getMessage(), equalToCompressingWhiteSpace("Expected DbObject and insert DbObject have different keys: Expected: [name] Inserted: [surname, name]"));
 		}
 		
 	}
@@ -277,7 +276,7 @@ public class WhenExpectedDataShouldBeCompared {
 			mongoOperation.databaseIs(new ByteArrayInputStream("{\"col1\":[{\"name\":\"Soto\"}]}".getBytes("UTF-8")));
 			fail();
 		}catch(NoSqlAssertionError e) {
-			assertThat(e.getMessage(), is("Object # { \"name\" : \"Soto\"} # is not found into collection [col1]"));
+			assertThat(e.getMessage(), equalToCompressingWhiteSpace("Object # Document{{name=Soto}} # is not found into collection [col1]"));
 		}
 		
 	}

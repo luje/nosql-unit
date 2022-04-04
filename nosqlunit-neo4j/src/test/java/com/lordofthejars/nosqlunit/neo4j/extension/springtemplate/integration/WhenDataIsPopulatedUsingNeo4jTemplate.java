@@ -1,15 +1,14 @@
 package com.lordofthejars.nosqlunit.neo4j.extension.springtemplate.integration;
 
 
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-import static ch.lambdaj.Lambda.selectFirst;
 import static com.lordofthejars.nosqlunit.neo4j.Neo4jRule.Neo4jRuleBuilder.newNeo4jRule;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.StreamSupport;
 
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -38,69 +37,73 @@ import com.lordofthejars.nosqlunit.neo4j.extension.springtemplate.SpringTemplate
 
 @Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="embedded-neo4j-spring-definition.xml")
+@ContextConfiguration(locations = "embedded-neo4j-spring-definition.xml")
 @CustomInsertionStrategy(insertionStrategy = SpringTemplateInsertionStrategy.class)
 @CustomComparisonStrategy(comparisonStrategy = SpringTemplateComparisonStrategy.class)
 public class WhenDataIsPopulatedUsingNeo4jTemplate {
 
-	@Autowired
-	private ApplicationContext applicationContext;
-	
-	@Autowired
-	private GraphDatabaseService graphDatabaseService;
-	
-	@Rule
-	public Neo4jRule neo4jRule = newNeo4jRule().defaultSpringGraphDatabaseServiceNeo4j();
+    @Autowired
+    private ApplicationContext applicationContext;
 
-	@Test
-	@UsingDataSet(locations="person.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
-	public void defined_data_should_be_inserted_into_neo4j() {
-		
-		Neo4jTemplate neo4jTemplate = new Neo4jTemplate(graphDatabaseService);
-		Result<Person> persons = neo4jTemplate.findAll(Person.class);
-		
-		Person person = selectFirst(persons, having(on(Person.class).getName(), is("alex")));
-		
-		assertThat(person, is(new Person("alex")));
-		
-		Set<Person> friends = person.getFriends();
-		assertThat(friends, containsInAnyOrder(new Person("josep")));
-		
-	}
-	
-	@Test
-	@UsingDataSet(locations="person.json", loadStrategy=LoadStrategyEnum.CLEAN_INSERT)
-	@ShouldMatchDataSet(location="expected-person.json")
-	public void new_data_should_be_compared_into_neo4j() {
-		
-		final Neo4jTemplate neo4jTemplate = new Neo4jTemplate(graphDatabaseService);
-		
-		TransactionTemplate transactionalTemplate = transactionalTemplate(graphDatabaseService);
-		transactionalTemplate.execute(new TransactionCallback<Void>() {
+    @Autowired
+    private GraphDatabaseService graphDatabaseService;
 
-			@Override
-			public Void doInTransaction(TransactionStatus status) {
-				
-				Person person = new Person();
-				person.setName("ada");
-				
-				neo4jTemplate.save(person);
-				
-				return null;
-			}
-		});
-		
-	}
-	
-	private TransactionTemplate transactionalTemplate(GraphDatabaseService graphDatabaseService) {
-		
-		try {
-			JtaTransactionManagerFactoryBean jtaTransactionManagerFactoryBean = new JtaTransactionManagerFactoryBean(graphDatabaseService);
-			return new TransactionTemplate(jtaTransactionManagerFactoryBean.getObject());
-		} catch (Exception e) {
-			throw new IllegalArgumentException(e);
-		}
-		
-	}
-	
+    @Rule
+    public Neo4jRule neo4jRule = newNeo4jRule().defaultSpringGraphDatabaseServiceNeo4j();
+
+    @Test
+    @UsingDataSet(locations = "person.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void defined_data_should_be_inserted_into_neo4j() {
+
+        Neo4jTemplate neo4jTemplate = new Neo4jTemplate(graphDatabaseService);
+        Result<Person> persons = neo4jTemplate.findAll(Person.class);
+
+        //selectFirst(persons, having(on(Person.class).getName(), is("alex")));
+        Person person = StreamSupport.stream(persons.spliterator(), false)
+                .filter(it -> Objects.equals(it.getName(), "alex"))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(person, is(new Person("alex")));
+
+        Set<Person> friends = person.getFriends();
+        assertThat(friends, containsInAnyOrder(new Person("josep")));
+
+    }
+
+    @Test
+    @UsingDataSet(locations = "person.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @ShouldMatchDataSet(location = "expected-person.json")
+    public void new_data_should_be_compared_into_neo4j() {
+
+        final Neo4jTemplate neo4jTemplate = new Neo4jTemplate(graphDatabaseService);
+
+        TransactionTemplate transactionalTemplate = transactionalTemplate(graphDatabaseService);
+        transactionalTemplate.execute(new TransactionCallback<Void>() {
+
+            @Override
+            public Void doInTransaction(TransactionStatus status) {
+
+                Person person = new Person();
+                person.setName("ada");
+
+                neo4jTemplate.save(person);
+
+                return null;
+            }
+        });
+
+    }
+
+    private TransactionTemplate transactionalTemplate(GraphDatabaseService graphDatabaseService) {
+
+        try {
+            JtaTransactionManagerFactoryBean jtaTransactionManagerFactoryBean = new JtaTransactionManagerFactoryBean(graphDatabaseService);
+            return new TransactionTemplate(jtaTransactionManagerFactoryBean.getObject());
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+
+    }
+
 }

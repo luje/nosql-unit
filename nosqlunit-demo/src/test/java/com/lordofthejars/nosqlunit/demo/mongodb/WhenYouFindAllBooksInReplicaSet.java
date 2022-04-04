@@ -27,7 +27,7 @@ import com.mongodb.MongoClient;
 public class WhenYouFindAllBooksInReplicaSet {
 
 	static {
-		System.setProperty("MONGO_HOME", "/opt/mongo");
+		System.setProperty("MONGO_HOME", "d:\\opt\\mongo");
 	}
 
 	@ClassRule

@@ -1,37 +1,30 @@
 package com.lordofthejars.nosqlunit.neo4j.integration;
 
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-import static ch.lambdaj.Lambda.selectFirst;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
-import static org.hamcrest.collection.IsArrayWithSize.emptyArray;
-import static org.junit.Assert.assertThat;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-
+import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
+import com.lordofthejars.nosqlunit.neo4j.Neo4jConfiguration;
+import com.lordofthejars.nosqlunit.neo4j.Neo4jLowLevelOps;
+import com.lordofthejars.nosqlunit.neo4j.Neo4jOperation;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.rest.graphdb.RestGraphDatabase;
 import org.neo4j.server.WrappingNeoServerBootstrapper;
 
-import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
-import com.lordofthejars.nosqlunit.neo4j.Neo4jConfiguration;
-import com.lordofthejars.nosqlunit.neo4j.Neo4jLowLevelOps;
-import com.lordofthejars.nosqlunit.neo4j.Neo4jOperation;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.stream.StreamSupport;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
+import static org.hamcrest.collection.IsArrayWithSize.emptyArray;
+import static org.junit.Assert.assertThat;
 
 public class WhenNeo4jOperationsAreRequired {
 
@@ -154,19 +147,43 @@ public class WhenNeo4jOperationsAreRequired {
 		Iterable<Node> allNodes = neo4jOperation.getAllNodes();
 		Iterable<Relationship> allRelationships = neo4jOperation.getAllRelationships();
 
-		Node firstNode = selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("I")));
+        //selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("I")));
+        Node firstNode = StreamSupport.stream(allNodes.spliterator(), false)
+                .filter(it -> Objects.equals(it.getProperty("name"), "I"))
+                .findFirst()
+                .orElse(null);
+
 		assertThat(firstNode, notNullValue());
-		
-		Node secondNode = selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("you")));
+
+        //selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("you")))
+		Node secondNode = StreamSupport.stream(allNodes.spliterator(), false)
+                .filter(it -> Objects.equals(it.getProperty("name"), "you"))
+                .findFirst()
+                .orElse(null);
+
 		assertThat(secondNode, notNullValue());
-		
-		Node thirdNode = selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("him")));
+
+        //selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("him")))
+		Node thirdNode = StreamSupport.stream(allNodes.spliterator(), false)
+                .filter(it -> Objects.equals(it.getProperty("name"), "him"))
+                .findFirst()
+                .orElse(null);
+
 		assertThat(thirdNode, notNullValue());
-		
-		Relationship firstRelationship = selectFirst(allRelationships, having(on(Relationship.class).getProperty("weight"), equalTo(Float.parseFloat("0.5"))));
+
+        //selectFirst(allRelationships, having(on(Relationship.class).getProperty("weight"), equalTo(Float.parseFloat("0.5"))))
+		Relationship firstRelationship = StreamSupport.stream(allRelationships.spliterator(), false)
+                .filter(it -> Objects.equals(it.getProperty("weight"), "0.5"))
+                .findFirst()
+                .orElse(null);
+
 		assertThat(firstRelationship, notNullValue());
-		
-		Relationship secondRelationship = selectFirst(allRelationships, having(on(Relationship.class).getProperty("weight"), equalTo(Float.parseFloat("0.8"))));
+
+        //selectFirst(allRelationships, having(on(Relationship.class).getProperty("weight"), equalTo(Float.parseFloat("0.8"))))
+		Relationship secondRelationship = StreamSupport.stream(allRelationships.spliterator(), false)
+                .filter(it -> Objects.equals(it.getProperty("weight"), "0.8"))
+                .findFirst()
+                .orElse(null);
 		assertThat(secondRelationship, notNullValue());
 		
 		String[] nodeIndexNames = newEmbeddedDatabase.index().nodeIndexNames();
@@ -206,23 +223,45 @@ public class WhenNeo4jOperationsAreRequired {
 		
 		Iterable<Node> allNodes = neo4jOperation.getAllNodes();
 		Iterable<Relationship> allRelationships = neo4jOperation.getAllRelationships();
-		
-		Node firstNode = selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("I")));
-		assertThat(firstNode, notNullValue());
-		
-		Node secondNode = selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("you")));
-		assertThat(secondNode, notNullValue());
-		
-		Node thirdNode = selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("him")));
-		assertThat(thirdNode, notNullValue());
-		
-		Relationship firstRelationship = selectFirst(allRelationships, having(on(Relationship.class).getProperty("weight"), equalTo(Float.parseFloat("0.5"))));
-		assertThat(firstRelationship, notNullValue());
-		
-		Relationship secondRelationship = selectFirst(allRelationships, having(on(Relationship.class).getProperty("weight"), equalTo(Float.parseFloat("0.8"))));
-		assertThat(secondRelationship, notNullValue());
-		
-		
+
+        //selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("I")));
+        Node firstNode = StreamSupport.stream(allNodes.spliterator(), false)
+                .filter(it -> Objects.equals(it.getProperty("name"), "I"))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(firstNode, notNullValue());
+
+        //selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("you")))
+        Node secondNode = StreamSupport.stream(allNodes.spliterator(), false)
+                .filter(it -> Objects.equals(it.getProperty("name"), "you"))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(secondNode, notNullValue());
+
+        //selectFirst(allNodes, having(on(Node.class).getProperty("name"), equalTo("him")))
+        Node thirdNode = StreamSupport.stream(allNodes.spliterator(), false)
+                .filter(it -> Objects.equals(it.getProperty("name"), "him"))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(thirdNode, notNullValue());
+
+        //selectFirst(allRelationships, having(on(Relationship.class).getProperty("weight"), equalTo(Float.parseFloat("0.5"))))
+        Relationship firstRelationship = StreamSupport.stream(allRelationships.spliterator(), false)
+                .filter(it -> Objects.equals(it.getProperty("weight"), "0.5"))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(firstRelationship, notNullValue());
+
+        //selectFirst(allRelationships, having(on(Relationship.class).getProperty("weight"), equalTo(Float.parseFloat("0.8"))))
+        Relationship secondRelationship = StreamSupport.stream(allRelationships.spliterator(), false)
+                .filter(it -> Objects.equals(it.getProperty("weight"), "0.8"))
+                .findFirst()
+                .orElse(null);
+        assertThat(secondRelationship, notNullValue());
 	}
 
 	

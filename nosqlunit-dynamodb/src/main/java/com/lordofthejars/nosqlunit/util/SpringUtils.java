@@ -1,7 +1,6 @@
 
 package com.lordofthejars.nosqlunit.util;
 
-import static ch.lambdaj.collection.LambdaCollections.*;
 import static org.hamcrest.CoreMatchers.*;
 
 import java.util.Map;
@@ -23,7 +22,7 @@ public class SpringUtils {
         do {
             beansOfType = applicationContext.getBeansOfType(aClass);
             if (beansOfType != null && beansOfType.size() > 0) {
-                return with(beansOfType).values().first(anything());
+                return beansOfType.values().stream().findFirst().get();
             }
             applicationContext = applicationContext.getParent();
         } while (applicationContext != null);

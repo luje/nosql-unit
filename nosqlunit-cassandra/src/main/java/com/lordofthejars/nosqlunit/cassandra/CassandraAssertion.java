@@ -1,13 +1,12 @@
 package com.lordofthejars.nosqlunit.cassandra;
 
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.join;
-import static ch.lambdaj.Lambda.on;
-import static ch.lambdaj.Lambda.selectUnique;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import me.prettyprint.cassandra.model.CqlQuery;
 import me.prettyprint.cassandra.model.CqlRows;
@@ -107,9 +106,9 @@ public class CassandraAssertion {
 
 	private static void checkSuperColumns(Keyspace keyspace, ColumnFamilyModel expectedColumnFamilyModel, RowModel expectedRowModel)
 			throws Error {
-		
+
 		String expectedColumnFamilyName = expectedColumnFamilyModel.getName();
-		
+
 		List<SuperColumnModel> expectedSuperColumns = expectedRowModel.getSuperColumns();
 		checkNumberOfSuperColumns(keyspace, expectedColumnFamilyName, expectedRowModel, expectedSuperColumns.size());
 
@@ -217,7 +216,7 @@ public class CassandraAssertion {
 				BytesArraySerializer.get(), BytesArraySerializer.get());
 		counterColumnQuery.setColumnFamily(expectedColumnFamilyName)
 				.setKey(getBytes(expectedRowModel.getKey())).setName(getBytes(expectedColumnModel.getName()));
-		
+
 		QueryResult<HCounterColumn<byte[]>> result = counterColumnQuery.execute();
 
 		HCounterColumn<byte[]> hColumn = result.get();
@@ -225,13 +224,13 @@ public class CassandraAssertion {
 		checkCounterColumnName(expectedColumnModel, hColumn);
 		checkCounterColumnValue(expectedRowModel, hColumn);
 	}
-	
+
 	private static void checkCounterColumnValue(RowModel expectedRowModel, HCounterColumn<byte[]> hColumn) throws Error {
 		byte[] expectedColumnName = hColumn.getName();
 		Long expectedColumnValue = hColumn.getValue();
 
 		byte[] expectedColumnValueBytes = getBytes(new GenericType(Long.toString(expectedColumnValue), GenericTypeEnum.LONG_TYPE));
-		
+
 		if (!areLoadValuesOnExpectedList(expectedRowModel.getColumns(), expectedColumnName, expectedColumnValueBytes)) {
 			throw FailureHandler.createFailure("Row with key %s does not contain column with name %s and value %s.",
 					asString(expectedRowModel.getKey()), new String(expectedColumnName),
@@ -245,7 +244,7 @@ public class CassandraAssertion {
 					asString(expectedColumnModel.getName()));
 		}
 	}
-	
+
 	private static void checkColumnName(ColumnModel expectedColumnModel, HColumn<byte[], byte[]> hColumn) throws Error {
 		if (hColumn == null) {
 			throw FailureHandler.createFailure("Expected name of column is %s but was not found.",
@@ -339,8 +338,10 @@ public class CassandraAssertion {
 
 	private static ColumnFamilyDefinition checkColumnFamilyName(List<ColumnFamilyDefinition> columnFamilyDefinitions,
 			ColumnFamilyModel expectedColumnFamilyModel) throws Error {
-		ColumnFamilyDefinition columnFamily = selectUnique(columnFamilyDefinitions,
-				having(on(ColumnFamilyDefinition.class).getName(), equalTo(expectedColumnFamilyModel.getName())));
+        ColumnFamilyDefinition columnFamily = columnFamilyDefinitions.stream()
+                .filter(it -> Objects.equals(it.getName(), expectedColumnFamilyModel.getName()))
+                .findFirst()
+                .orElse(null);
 
 		if (columnFamily == null) {
 			throw FailureHandler.createFailure("Expected name of column family is %s but was not found.",
@@ -381,11 +382,10 @@ public class CassandraAssertion {
 	private static String asString(GenericType genericType) {
 
 		if (genericType.getType() == GenericTypeEnum.COMPOSITE_TYPE) {
-			return "<" + join(genericType.getCompositeValues()) + ">";
+			return "<" + Stream.of(genericType.getCompositeValues()).collect(Collectors.joining()) + ">";
 		}
 
 		return genericType.getValue();
-
 	}
 
 }

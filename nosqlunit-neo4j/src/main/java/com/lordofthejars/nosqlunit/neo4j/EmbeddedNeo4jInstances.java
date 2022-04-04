@@ -1,12 +1,9 @@
 package com.lordofthejars.nosqlunit.neo4j;
 
-import static ch.lambdaj.collection.LambdaCollections.with;
-import static org.hamcrest.CoreMatchers.anything;
+import org.neo4j.graphdb.GraphDatabaseService;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.neo4j.graphdb.GraphDatabaseService;
 
 public final class EmbeddedNeo4jInstances {
 
@@ -38,7 +35,7 @@ public final class EmbeddedNeo4jInstances {
 	}
 	
 	public GraphDatabaseService getDefaultGraphDatabaseService() {
-		return with(this.instances).values().first(anything());
+		return this.instances.values().stream().findFirst().orElse(null);
 	}
 	
 }

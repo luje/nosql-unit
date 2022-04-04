@@ -6,12 +6,8 @@ import static com.lordofthejars.nosqlunit.demo.mongodb.MongoDbBookConverter.TITL
 import com.lordofthejars.nosqlunit.demo.model.Book;
 import com.mongodb.DBObject;
 
-import ch.lambdaj.function.convert.Converter;
+public class DbObjectBookConverter {
 
-public class DbObjectBookConverter implements
-		Converter<DBObject, Book> {
-
-	@Override
 	public Book convert(DBObject dbObject) {
 		
 		String title = (String) dbObject.get(TITLE_FIELD);

@@ -16,11 +16,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class WhenMongoDbOperationsAreRequired {
 
@@ -83,9 +81,9 @@ public class WhenMongoDbOperationsAreRequired {
             + "   }"
             + "}";
 
-    private static final String[] EXPECTED_COLLECTION_1 = new String[] {"{ \"id\" : 1, \"code\" : \"JSON dataset\" }", "{ \"id\" : 2, \"code\" : \"Another row\" }"};
+    private static final String[] EXPECTED_COLLECTION_1 = new String[] {"{\"id\": 1, \"code\": \"JSON dataset\"}","{\"id\": 2, \"code\": \"Another row\"}"};
 
-    private static final String[] EXPECTED_COLLECTION_2 = new String[] {"{ \"id\" : 3, \"code\" : \"JSON dataset 2\" }", "{ \"id\" : 4, \"code\" : \"Another row 2\" }"};
+    private static final String[] EXPECTED_COLLECTION_2 = new String[] {"{\"id\": 3, \"code\": \"JSON dataset 2\"}","{\"id\": 4, \"code\": \"Another row 2\"}"};
 
     @Mock
     private MongoClient mongo;
@@ -154,7 +152,7 @@ public class WhenMongoDbOperationsAreRequired {
         mongoOperation.insert(new ByteArrayInputStream(DATA_SHARD.getBytes("UTF-8")));
 
         verifyInsertedData(EXPECTED_COLLECTION_1, collection1);
-        verifyEnableShardingCommand("{ \"shardcollection\" : \"test.collection1\" , \"key\" : { \"id\" : 1 , \"code\" : 1}}", dbAdmin);
+        verifyEnableShardingCommand("{\"shardcollection\": \"test.collection1\", \"key\": {\"id\": 1, \"code\": 1}}", dbAdmin);
     }
 
     @Test
@@ -243,7 +241,7 @@ public class WhenMongoDbOperationsAreRequired {
         Document command = enableShardingCommandCaptor.getValue();
 
         String commandDocument = command.toJson();
-        assertThat(commandDocument, is(expectedCommand));
+        assertThat(commandDocument, equalToCompressingWhiteSpace(expectedCommand));
 
     }
 
@@ -256,7 +254,7 @@ public class WhenMongoDbOperationsAreRequired {
 
         List<Document> allValues = insertCaptor.getAllValues();
         for (int i = 0; i < expectedData.length; i++) {
-            assertThat(allValues.get(i).toJson(), is(expectedData[i]));
+            assertThat(allValues.get(i).toJson(), equalToCompressingWhiteSpace(expectedData[i]));
         }
 
     }

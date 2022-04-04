@@ -1,41 +1,20 @@
 package com.lordofthejars.nosqlunit.redis;
 
-import static ch.lambdaj.Lambda.extract;
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-import static ch.lambdaj.collection.LambdaCollections.with;
-import static com.lordofthejars.nosqlunit.redis.parser.DataReader.DATA_TOKEN;
-import static com.lordofthejars.nosqlunit.redis.parser.DataReader.FIELD_TOKEN;
-import static com.lordofthejars.nosqlunit.redis.parser.DataReader.HASH_TOKEN;
-import static com.lordofthejars.nosqlunit.redis.parser.DataReader.KEY_TOKEN;
-import static com.lordofthejars.nosqlunit.redis.parser.DataReader.LIST_TOKEN;
-import static com.lordofthejars.nosqlunit.redis.parser.DataReader.SCORE_TOKEN;
-import static com.lordofthejars.nosqlunit.redis.parser.DataReader.SET_TOKEN;
-import static com.lordofthejars.nosqlunit.redis.parser.DataReader.SIMPLE_TOKEN;
-import static com.lordofthejars.nosqlunit.redis.parser.DataReader.SORTSET_TOKEN;
-import static com.lordofthejars.nosqlunit.redis.parser.DataReader.VALUES_TOKEN;
-import static com.lordofthejars.nosqlunit.redis.parser.DataReader.VALUE_TOKEN;
-import static com.lordofthejars.nosqlunit.redis.parser.JsonToJedisConverter.toByteArray;
-import static org.hamcrest.Matchers.equalTo;
-
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
-
+import com.lordofthejars.nosqlunit.core.FailureHandler;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-
 import redis.clients.jedis.Jedis;
 
-import com.lordofthejars.nosqlunit.core.FailureHandler;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.lordofthejars.nosqlunit.redis.parser.DataReader.*;
+import static com.lordofthejars.nosqlunit.redis.parser.JsonToJedisConverter.toByteArray;
 
 public class RedisAssertion {
 
@@ -150,8 +129,10 @@ public class RedisAssertion {
 
 			Set<Entry<byte[], byte[]>> currentFieldsSet = currentFields.entrySet();
 
-			Entry<byte[], byte[]> unique = with(currentFieldsSet).unique(
-					having(on(Entry.class).getKey(), equalTo(expectedFieldName)));
+			Entry<byte[], byte[]> unique = currentFieldsSet.stream()
+                    .filter(it -> Objects.equals(it.getKey(), expectedField))
+                    .findFirst()
+                    .get();
 
 			if (unique != null) {
 
@@ -230,19 +211,11 @@ public class RedisAssertion {
 	}
 
 	private static List<byte[]> extractSortValues(JSONArray expectedValuesArray) {
-
-		Set<SortElement> elementsOrderedByScore = new TreeSet<RedisAssertion.SortElement>();
-
-		for (Object expectedObject : expectedValuesArray) {
-			JSONObject expectedValue = (JSONObject) expectedObject;
-
-			elementsOrderedByScore.add(new SortElement((java.lang.Number) expectedValue.get(SCORE_TOKEN),
-					toByteArray(expectedValue.get(VALUE_TOKEN))));
-
-		}
-
-		return extract(elementsOrderedByScore, on(SortElement.class).getValue());
-
+        return ((Stream<JSONObject>) expectedValuesArray.stream())
+                .map(it -> new SortElement((java.lang.Number) it.get(SCORE_TOKEN), toByteArray(it.get(VALUE_TOKEN))))
+                .sorted()
+                .map(SortElement::getValue)
+                .collect(Collectors.toList());
 	}
 
 	private static long checkSetsValue(JSONObject expectedElementObject, RedisConnectionCallback redisConnectionCallback) {

@@ -15,7 +15,6 @@ import org.junit.*;
 import java.io.IOException;
 import java.util.Optional;
 
-import static ch.lambdaj.function.matcher.OrMatcher.or;
 import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogic.MarkLogicServerRuleBuilder.newManagedMarkLogicRule;
 import static com.lordofthejars.nosqlunit.marklogic.ManagedMarkLogicConfigurationBuilder.marklogic;
 import static com.lordofthejars.nosqlunit.marklogic.ml.DefaultMarkLogic.*;
@@ -24,6 +23,7 @@ import static com.lordofthejars.nosqlunit.marklogic.ml.MarkLogicREST.createRESTS
 import static com.lordofthejars.nosqlunit.marklogic.ml.MarkLogicREST.deleteRESTServerWithDB;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
+import static org.mockito.AdditionalMatchers.or;
 
 /**
  * Tests rules with two different MarkLogic databases.

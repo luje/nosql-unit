@@ -1,14 +1,10 @@
 package com.lordofthejars.nosqlunit.mongodb.replicaset;
 
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-import static ch.lambdaj.Lambda.selectFirst;
-import static org.hamcrest.CoreMatchers.is;
+import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManager;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import com.lordofthejars.nosqlunit.mongodb.ManagedMongoDbLifecycleManager;
+import java.util.Objects;
 
 public class ReplicaSetGroup {
 
@@ -68,17 +64,19 @@ public class ReplicaSetGroup {
 	}
 	
 	public ManagedMongoDbLifecycleManager getStoppedServer(int port) {
-		return selectFirst(
-				this.servers,
-				having(on(ManagedMongoDbLifecycleManager.class).getPort(),
-						is(port)).and(having(on(ManagedMongoDbLifecycleManager.class).isReady(), is(false))));
+        return this.servers.stream()
+                .filter(it -> Objects.equals(port, it.getPort()))
+                .filter(it -> Objects.equals(false, it.isReady()))
+                .findFirst()
+                .orElse(null);
 	}
-	
+
 	public ManagedMongoDbLifecycleManager getStartedServer(int port) {
-		return selectFirst(
-				this.servers,
-				having(on(ManagedMongoDbLifecycleManager.class).getPort(),
-						is(port)).and(having(on(ManagedMongoDbLifecycleManager.class).isReady(), is(true))));
+        return     this.servers.stream()
+                .filter(it -> Objects.equals(port, it.getPort()))
+                .filter(it -> Objects.equals(true, it.isReady()))
+                .findFirst()
+                .orElse(null);
 	}
 	
 	public int numberOfStartedServers() {

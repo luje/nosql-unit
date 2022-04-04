@@ -1,13 +1,13 @@
 package com.lordofthejars.nosqlunit.mongodb;
 
 import com.lordofthejars.nosqlunit.core.AbstractLifecycleManager;
-import com.lordofthejars.nosqlunit.util.EmbeddedInstances;
 import com.mongodb.ConnectionString;
-import com.mongodb.client.MongoClient;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-import de.flapdoodle.embed.mongo.Command;
+import de.bwaldvogel.mongo.MongoServer;
+import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodStarter;
 import de.flapdoodle.embed.mongo.config.ImmutableMongodConfig;
@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Arrays;
+import java.net.InetSocketAddress;
 
 public class InMemoryMongoDbLifecycleManager extends AbstractLifecycleManager {
 
@@ -53,7 +53,7 @@ public class InMemoryMongoDbLifecycleManager extends AbstractLifecycleManager {
 	private MongodExecutable embeddedMongo(){
 
 		ImmutableMongodConfig mongodConfig = MongodConfig.builder()
-				.version(Version.V4_4_1)
+				.version(Version.V4_4_13)
 //				.net(new Net(host, port, Network.localhostIsIPv6()))
 				.build();
 
@@ -62,8 +62,12 @@ public class InMemoryMongoDbLifecycleManager extends AbstractLifecycleManager {
 	}
 
 	private MongoClient fongo(String targetPath) {
-		MongoClientSettings clientSettings = MongoClientSettings.builder()
-				.applyConnectionString(new ConnectionString(targetPath))
+        final MongoServer server = new MongoServer(new MemoryBackend());
+
+        final InetSocketAddress inetSocketAddress = server.bind();
+
+        MongoClientSettings clientSettings = MongoClientSettings.builder()
+                .applyConnectionString(new ConnectionString("mongodb://" + new ServerAddress(inetSocketAddress)))
 				.build();
 
 		return MongoClients.create(clientSettings);

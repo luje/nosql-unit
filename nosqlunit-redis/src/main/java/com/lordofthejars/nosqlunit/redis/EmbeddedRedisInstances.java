@@ -1,12 +1,9 @@
 package com.lordofthejars.nosqlunit.redis;
 
-import static ch.lambdaj.collection.LambdaCollections.with;
-import static org.hamcrest.CoreMatchers.anything;
+import redis.clients.jedis.Jedis;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import redis.clients.jedis.Jedis;
 
 
 public class EmbeddedRedisInstances {
@@ -39,7 +36,7 @@ public class EmbeddedRedisInstances {
 	}
 	
 	public Jedis getDefaultJedis() {
-		return with(this.instances).values().first(anything());
+		return this.instances.values().stream().findFirst().get();
 	}
 	
 }
