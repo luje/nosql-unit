@@ -23,6 +23,7 @@ import static org.junit.Assert.assertThat;
 
 
 public abstract class SpringEmbeddedInstanceBase {
+
     @Autowired
     private ApplicationContext applicationContext;
 

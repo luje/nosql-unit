@@ -29,13 +29,13 @@ public class WhenSelectiveAnnotationIsUsed {
 
 	@ClassRule
 	public static ManagedMongoDb managedMongoDb1 = newManagedMongoDbRule()
-			.mongodPath("/opt/mongo").logRelativePath("log1")
+			.mongodPath("d:\\opt\\mongo").logRelativePath("log1")
 			.dbRelativePath("mongo-dbpath1").targetPath("target/mongo-temp1")
 			.port(27017).build();
 
 	@ClassRule
 	public static ManagedMongoDb managedMongoDb2 = newManagedMongoDbRule()
-			.mongodPath("/opt/mongo").logRelativePath("log2")
+			.mongodPath("d:\\opt\\mongo").logRelativePath("log2")
 			.dbRelativePath("mongo-dbpath2").targetPath("target/mongo-temp2")
 			.port(27017 + 1).build();
 

@@ -13,7 +13,6 @@ import org.ektorp.http.HttpClient;
 import org.ektorp.http.StdHttpClient;
 import org.ektorp.impl.StdCouchDbInstance;
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.ClassRule;
@@ -123,7 +122,6 @@ public class WhenManagedCouchDbOperationsAreRequired {
             return map.get("name").equals(expectedMap.get("name")) && map.get("age").equals(expectedMap.get("age"));
         }
 
-        @Factory
         public static <T> Matcher<Map<String, Object>> mappedBy(Map<String, Object> map) {
             return new MapMatcher(map);
         }

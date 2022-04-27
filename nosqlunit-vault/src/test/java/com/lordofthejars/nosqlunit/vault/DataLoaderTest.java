@@ -7,14 +7,14 @@ import com.bettercloud.vault.response.AuthResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,7 +67,7 @@ public class DataLoaderTest {
 
         when(response.getAuthClientToken()).thenReturn("aa-bb-cc-dd");
 
-        when(auth.createToken(anyObject(), anyObject(), anyObject(), anyObject(), anyObject(), anyObject(), anyObject(), anyObject()))
+        when(auth.createToken(any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(response);
 
         final DataLoader dataLoader = new DataLoader(vaultConnection);

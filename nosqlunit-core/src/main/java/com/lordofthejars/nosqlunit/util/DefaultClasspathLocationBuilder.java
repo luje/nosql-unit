@@ -1,13 +1,13 @@
 package com.lordofthejars.nosqlunit.util;
 
-import org.junit.runners.model.FrameworkMethod;
+import java.lang.reflect.Method;
 
 public class DefaultClasspathLocationBuilder {
 
 	private static final String METHOD_SEPARATOR = "#";
 	
-	public static final String defaultClassAnnotatedClasspathLocation(FrameworkMethod method) {
-		String testClassName = method.getMethod().getDeclaringClass().getName();
+	public static final String defaultClassAnnotatedClasspathLocation(Method method) {
+		String testClassName = method.getDeclaringClass().getName();
 		String defaultClassAnnotatedClasspath = "/"
 				+ testClassName.replace('.', '/');
 		
@@ -15,7 +15,7 @@ public class DefaultClasspathLocationBuilder {
 	}
 	
 	public static String defaultMethodAnnotatedClasspathLocation(
-			FrameworkMethod method,
+			Method method,
 			String defaultClassAnnotatedClasspath, String suffix) {
 		String testMethodName = method.getName();
 

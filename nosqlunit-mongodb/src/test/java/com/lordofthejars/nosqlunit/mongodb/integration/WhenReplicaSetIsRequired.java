@@ -23,7 +23,7 @@ import static org.junit.Assert.assertThat;
 public class WhenReplicaSetIsRequired {
 
     static {
-        System.setProperty("MONGO_HOME", "/opt/mongo");
+        System.setProperty("MONGO_HOME", "d:\\opt\\mongo");
     }
 
     @ClassRule

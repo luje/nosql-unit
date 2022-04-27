@@ -52,7 +52,7 @@ public class WhenExpectedDataShouldBeCompared {
 			"}";
 	
 	@ClassRule
-	public static ManagedMongoDb managedMongoDb = newManagedMongoDbRule().mongodPath("/opt/mongo")
+	public static ManagedMongoDb managedMongoDb = newManagedMongoDbRule().mongodPath("d:\\opt\\mongo")
 			.build();
 	
 	private static MongoOperation mongoOperation;

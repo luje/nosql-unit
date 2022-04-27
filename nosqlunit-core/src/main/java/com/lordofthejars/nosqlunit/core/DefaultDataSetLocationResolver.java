@@ -1,12 +1,11 @@
 package com.lordofthejars.nosqlunit.core;
 
-import static com.lordofthejars.nosqlunit.core.IOUtils.isFileAvailableOnClasspath;
+import com.lordofthejars.nosqlunit.util.DefaultClasspathLocationBuilder;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
-import org.junit.runners.model.FrameworkMethod;
-
-import com.lordofthejars.nosqlunit.util.DefaultClasspathLocationBuilder;
+import static com.lordofthejars.nosqlunit.core.IOUtils.isFileAvailableOnClasspath;
 
 
 public class DefaultDataSetLocationResolver {
@@ -21,7 +20,7 @@ public class DefaultDataSetLocationResolver {
 		return resourceBase;
 	}
 	
-	public String resolveDefaultDataSetLocation(Annotation annotation, FrameworkMethod method, String suffix) {
+	public String resolveDefaultDataSetLocation(Annotation annotation, Method method, String suffix) {
 		
 		String defaultClassAnnotatedClasspath = DefaultClasspathLocationBuilder.defaultClassAnnotatedClasspathLocation(method);
 		
@@ -65,7 +64,7 @@ public class DefaultDataSetLocationResolver {
 		return null;
 	}
 
-	private boolean isMethodAnnotated(FrameworkMethod method, Annotation annotation) {
+	private boolean isMethodAnnotated(Method method, Annotation annotation) {
 		return method.getAnnotation(annotation.annotationType()) != null;
 	}
 	

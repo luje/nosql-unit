@@ -8,17 +8,15 @@ import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VaultAssertionTest {
@@ -67,7 +65,7 @@ public class VaultAssertionTest {
         when(vaultConnection.createToken()).thenReturn(new VaultConnection.TokenCreator(vault));
         when(vault.auth()).thenReturn(auth);
 
-        when(auth.createToken(anyObject(), anyObject(), anyObject(), anyObject(), anyObject(), anyObject(), anyObject(), anyObject()))
+        when(auth.createToken(any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(response);
 
         final Map<String, String> fooSecret = new HashMap<>();

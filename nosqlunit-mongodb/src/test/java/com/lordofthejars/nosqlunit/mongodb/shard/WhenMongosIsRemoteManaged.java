@@ -1,9 +1,9 @@
 package com.lordofthejars.nosqlunit.mongodb.shard;
 
 import static com.lordofthejars.nosqlunit.mongodb.shard.ManagedMongosLifecycleManagerBuilder.newManagedMongosLifecycle;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,7 +27,7 @@ import com.lordofthejars.nosqlunit.mongodb.MongoDbLowLevelOps;
 
 public class WhenMongosIsRemoteManaged {
 
-	private static final String MONGODB_LOCATION = "/Users/alex/Applications/mongodb-osx-x86_64-2.0.5";
+	private static final String MONGODB_LOCATION = "d:\\opt\\mongo";
 
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -96,7 +96,7 @@ public class WhenMongosIsRemoteManaged {
 		managedMongosLifecycleManager.stopEngine();
 
 		verify(commandLineExecutor).startProcessInDirectoryAndArguments(
-				"target/mongo-temp", expectedCommand);
+				"target\\mongo-temp", expectedCommand);
 
 	}
 	
@@ -156,7 +156,7 @@ public class WhenMongosIsRemoteManaged {
 		managedMongosLifecycleManager.stopEngine();
 
 		verify(commandLineExecutor).startProcessInDirectoryAndArguments(
-				"target/mongo-temp", expectedCommand);
+				"target\\mongo-temp", expectedCommand);
 
 	}
 

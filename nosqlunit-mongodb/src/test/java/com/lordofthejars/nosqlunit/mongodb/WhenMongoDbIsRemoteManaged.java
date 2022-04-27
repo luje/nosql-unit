@@ -19,14 +19,14 @@ import java.util.List;
 import static com.lordofthejars.nosqlunit.mongodb.ManagedMongoDb.MongoServerRuleBuilder.newManagedMongoDbRule;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class WhenMongoDbIsRemoteManaged {
 
-	private static final String MONGODB_LOCATION = "/Users/alex/Applications/mongodb-osx-x86_64-2.0.5/";
+	private static final String MONGODB_LOCATION = "d:\\opt\\mongo";
 
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -37,7 +37,7 @@ public class WhenMongoDbIsRemoteManaged {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 	}
 
 	@Test

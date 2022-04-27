@@ -24,7 +24,7 @@ import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
 public class WhenMongoObjectIsAnnotatedWithInject {
 
 	@ClassRule
-	public static ManagedMongoDb managedMongoDb = newManagedMongoDbRule().mongodPath("/opt/mongo")
+	public static ManagedMongoDb managedMongoDb = newManagedMongoDbRule().mongodPath("d:\\opt\\mongo")
 			.build();
 	
 	@Inject

@@ -35,7 +35,7 @@ import com.mongodb.MongoException;
 public class WhenMongoDbRuleIsRegistered {
 
 	@ClassRule
-	public static ManagedMongoDb managedMongoDb = newManagedMongoDbRule().mongodPath("/opt/mongo").build();
+	public static ManagedMongoDb managedMongoDb = newManagedMongoDbRule().mongodPath("d:\\opt\\mongo").build();
 
 	@Test(expected = NoSqlAssertionError.class)
 	public void should_fail_if_expected_data_is_non_strict_equal() throws Throwable {

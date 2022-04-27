@@ -96,7 +96,7 @@ public class WhenMongoDbOperationsAreRequired {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         when(mongo.getDatabase("admin")).thenReturn(dbAdmin);
         when(mongo.getDatabase("test")).thenReturn(db);

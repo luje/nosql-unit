@@ -4,12 +4,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.any;
+
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -42,645 +43,644 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyOperation;
 
 public class WhenTestClassIsAnnotatedWithNoSQLUnitAnnotations {
 
-	@Mock
-	public Statement base;
+    @Mock
+    public Statement base;
 
-	@Mock
-	public LoadStrategyFactory loadStrategyFactory;
+    @Mock
+    public LoadStrategyFactory loadStrategyFactory;
 
-	@Mock
-	public DatabaseOperation databaseOperation;
+    @Mock
+    public DatabaseOperation databaseOperation;
 
-	@Mock
-	public AbstractCustomizableDatabaseOperation abstractCustomizableDatabaseOperation;
-	
-	@Mock
-	public LoadStrategyOperation loadStrategyOperation;
+    @Mock
+    public AbstractCustomizableDatabaseOperation abstractCustomizableDatabaseOperation;
 
-	@Mock
-	public InjectAnnotationProcessor injectAnnotationProcessor;
+    @Mock
+    public LoadStrategyOperation loadStrategyOperation;
 
-	@Before
-	public void setUp() {
-		MockitoAnnotations.initMocks(this);
-	}
+    @Mock
+    public InjectAnnotationProcessor injectAnnotationProcessor;
 
-	@Test
-	public void selective_annotations_should_not_load_data_of_not_identified_rules_but_global() throws Throwable {
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
-				loadStrategyOperation);
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+    }
 
-		FrameworkMethod frameworkMethod = frameworkMethod(MyGlobalAndSelectiveClass.class, "my_unknown_test");
+    @Test
+    public void selective_annotations_should_not_load_data_of_not_identified_rules_but_global() throws Throwable {
+        when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
+                loadStrategyOperation);
 
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
-		abstractNoSqlTestRule.setIdentifier("two");
+        FrameworkMethod frameworkMethod = frameworkMethod(MyGlobalAndSelectiveClass.class, "my_unknown_test");
 
-		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+        AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+        abstractNoSqlTestRule.setIdentifier("two");
 
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+        doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+        doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
 
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+        when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 
-		abstractNoSqlTestRule.apply(base, frameworkMethod, new MyGlobalAndSelectiveClass()).evaluate();
+        abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+        abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		ArgumentCaptor<InputStream[]> streamCaptor = ArgumentCaptor.forClass(InputStream[].class);
+        abstractNoSqlTestRule.apply(base, frameworkMethod, new MyGlobalAndSelectiveClass()).evaluate();
 
-		verify(loadStrategyOperation, times(1)).executeScripts(streamCaptor.capture());
+        ArgumentCaptor<InputStream[]> streamCaptor = ArgumentCaptor.forClass(InputStream[].class);
 
-		InputStream[] isContents = streamCaptor.getValue();
-		String scriptContent = IOUtils.readFullStream(isContents[0]);
-		assertThat(scriptContent, is("Class Annotation"));
+        verify(loadStrategyOperation, times(1)).executeScripts(streamCaptor.capture());
 
-	}
+        InputStream[] isContents = streamCaptor.getValue();
+        String scriptContent = IOUtils.readFullStream(isContents[0]);
+        assertThat(scriptContent, is("Class Annotation"));
 
-	@Test
-	public void selective_annotations_should_load_only_load_data_of_identified_rules_and_global_data() throws Throwable {
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
-				loadStrategyOperation);
+    }
 
-		FrameworkMethod frameworkMethod = frameworkMethod(MyGlobalAndSelectiveClass.class, "my_unknown_test");
+    @Test
+    public void selective_annotations_should_load_only_load_data_of_identified_rules_and_global_data() throws Throwable {
+        when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
+                loadStrategyOperation);
 
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
-		abstractNoSqlTestRule.setIdentifier("one");
+        FrameworkMethod frameworkMethod = frameworkMethod(MyGlobalAndSelectiveClass.class, "my_unknown_test");
 
-		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+        AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+        abstractNoSqlTestRule.setIdentifier("one");
 
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+        doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+        doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
 
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+        when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 
-		abstractNoSqlTestRule.apply(base, frameworkMethod, new MyGlobalAndSelectiveClass()).evaluate();
+        abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+        abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		ArgumentCaptor<InputStream[]> streamCaptor = ArgumentCaptor.forClass(InputStream[].class);
+        abstractNoSqlTestRule.apply(base, frameworkMethod, new MyGlobalAndSelectiveClass()).evaluate();
 
-		verify(loadStrategyOperation, times(1)).executeScripts(streamCaptor.capture());
+        ArgumentCaptor<InputStream[]> streamCaptor = ArgumentCaptor.forClass(InputStream[].class);
 
-		InputStream[] isContents = streamCaptor.getValue();
-		String scriptContent = IOUtils.readFullStream(isContents[0]);
-		assertThat(scriptContent, is("Class Annotation"));
+        verify(loadStrategyOperation, times(1)).executeScripts(streamCaptor.capture());
 
-		scriptContent = IOUtils.readFullStream(isContents[1]);
-		assertThat(scriptContent, is("Selective Annotation"));
-	}
+        InputStream[] isContents = streamCaptor.getValue();
+        String scriptContent = IOUtils.readFullStream(isContents[0]);
+        assertThat(scriptContent, is("Class Annotation"));
 
-	@Test
-	public void selective_annotations_should_not_load_data_of_not_identified_rules() throws Throwable {
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
-				loadStrategyOperation);
+        scriptContent = IOUtils.readFullStream(isContents[1]);
+        assertThat(scriptContent, is("Selective Annotation"));
+    }
 
-		FrameworkMethod frameworkMethod = frameworkMethod(MySelectiveClass.class, "my_unknown_test");
+    @Test
+    public void selective_annotations_should_not_load_data_of_not_identified_rules() throws Throwable {
+        when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
+                loadStrategyOperation);
 
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
-		abstractNoSqlTestRule.setIdentifier("two");
+        FrameworkMethod frameworkMethod = frameworkMethod(MySelectiveClass.class, "my_unknown_test");
 
-		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+        AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+        abstractNoSqlTestRule.setIdentifier("two");
 
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+        doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+        doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
 
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+        when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 
-		ArgumentCaptor<InputStream[]> streamCaptor = ArgumentCaptor.forClass(InputStream[].class);
+        abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+        abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		abstractNoSqlTestRule.apply(base, frameworkMethod, new MySelectiveClass()).evaluate();
+        ArgumentCaptor<InputStream[]> streamCaptor = ArgumentCaptor.forClass(InputStream[].class);
 
-		verify(loadStrategyOperation, times(1)).executeScripts(streamCaptor.capture());
+        abstractNoSqlTestRule.apply(base, frameworkMethod, new MySelectiveClass()).evaluate();
 
-		assertThat(streamCaptor.getValue(), arrayWithSize(0));
+        verify(loadStrategyOperation, times(1)).executeScripts(streamCaptor.capture());
 
-	}
+        assertThat(streamCaptor.getValue(), arrayWithSize(0));
 
-	@Test
-	public void selective_annotations_should_load_only_load_data_of_identified_rules() throws Throwable {
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
-				loadStrategyOperation);
+    }
 
-		FrameworkMethod frameworkMethod = frameworkMethod(MySelectiveClass.class, "my_unknown_test");
+    @Test
+    public void selective_annotations_should_load_only_load_data_of_identified_rules() throws Throwable {
+        when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
+                loadStrategyOperation);
 
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
-		abstractNoSqlTestRule.setIdentifier("one");
+        FrameworkMethod frameworkMethod = frameworkMethod(MySelectiveClass.class, "my_unknown_test");
 
-		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+        AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+        abstractNoSqlTestRule.setIdentifier("one");
 
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+        doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+        doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
 
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+        when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 
-		abstractNoSqlTestRule.apply(base, frameworkMethod, new MySelectiveClass()).evaluate();
+        abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+        abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		ArgumentCaptor<InputStream[]> streamCaptor = ArgumentCaptor.forClass(InputStream[].class);
+        abstractNoSqlTestRule.apply(base, frameworkMethod, new MySelectiveClass()).evaluate();
 
-		verify(loadStrategyOperation, times(1)).executeScripts(streamCaptor.capture());
+        ArgumentCaptor<InputStream[]> streamCaptor = ArgumentCaptor.forClass(InputStream[].class);
 
-		InputStream[] isContents = streamCaptor.getValue();
-		String scriptContent = IOUtils.readFullStream(isContents[0]);
-		assertThat(scriptContent, is("Selective Annotation"));
+        verify(loadStrategyOperation, times(1)).executeScripts(streamCaptor.capture());
 
-	}
+        InputStream[] isContents = streamCaptor.getValue();
+        String scriptContent = IOUtils.readFullStream(isContents[0]);
+        assertThat(scriptContent, is("Selective Annotation"));
 
-	
-	
-	@Test
-	public void annotated_class_without_locations_should_use_class_name_approach() throws Throwable {
+    }
 
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
-				loadStrategyOperation);
 
-		FrameworkMethod frameworkMethod = frameworkMethod(MyTestClass.class, "my_unknown_test");
+    @Test
+    public void annotated_class_without_locations_should_use_class_name_approach() throws Throwable {
 
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+        when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
+                loadStrategyOperation);
 
-		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+        FrameworkMethod frameworkMethod = frameworkMethod(MyTestClass.class, "my_unknown_test");
 
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+        AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
 
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+        doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+        doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
 
-		abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestClass()).evaluate();
+        when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 
-		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
-		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+        abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+        abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		verify(loadStrategyOperation, times(1)).executeScripts(streamsCaptor.capture());
+        abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestClass()).evaluate();
 
-		InputStream[] isContents = streamsCaptor.getValue();
-		String scriptContent = IOUtils.readFullStream(isContents[0]);
-		assertThat(scriptContent, is("Default Class Name Strategy 2"));
+        ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
+        ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
 
-		verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
+        verify(loadStrategyOperation, times(1)).executeScripts(streamsCaptor.capture());
 
-		InputStream isContent = streamCaptor.getValue();
-		scriptContent = IOUtils.readFullStream(isContent);
-		assertThat(scriptContent, is("Default Class Name Strategy 2"));
+        InputStream[] isContents = streamsCaptor.getValue();
+        String scriptContent = IOUtils.readFullStream(isContents[0]);
+        assertThat(scriptContent, is("Default Class Name Strategy 2"));
 
-	}
+        verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
 
-	@Test
-	public void annotated_methods_without_locations_should_use_class_name_approach_if_method_file_not_found()
-			throws Throwable {
+        InputStream isContent = streamCaptor.getValue();
+        scriptContent = IOUtils.readFullStream(isContent);
+        assertThat(scriptContent, is("Default Class Name Strategy 2"));
 
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
-				loadStrategyOperation);
+    }
 
-		FrameworkMethod frameworkMethod = frameworkMethod(MyTestMethodClass.class, "my_unknown_test");
+    @Test
+    public void annotated_methods_without_locations_should_use_class_name_approach_if_method_file_not_found()
+            throws Throwable {
 
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+        when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
+                loadStrategyOperation);
 
-		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
-		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+        FrameworkMethod frameworkMethod = frameworkMethod(MyTestMethodClass.class, "my_unknown_test");
 
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+        AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
 
-		abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestMethodClass()).evaluate();
+        doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+        doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+        when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 
-		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
-		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+        abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+        abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		verify(loadStrategyOperation, times(1)).executeScripts(streamsCaptor.capture());
+        abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestMethodClass()).evaluate();
 
-		InputStream[] isContents = streamsCaptor.getValue();
-		String scriptContent = IOUtils.readFullStream(isContents[0]);
-		assertThat(scriptContent, is("Default Class Name Strategy"));
+        ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
+        ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
 
-		verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
+        verify(loadStrategyOperation, times(1)).executeScripts(streamsCaptor.capture());
 
-		InputStream isContent = streamCaptor.getValue();
-		scriptContent = IOUtils.readFullStream(isContent);
-		assertThat(scriptContent, is("Default Class Name Strategy"));
+        InputStream[] isContents = streamsCaptor.getValue();
+        String scriptContent = IOUtils.readFullStream(isContents[0]);
+        assertThat(scriptContent, is("Default Class Name Strategy"));
 
-	}
+        verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
 
-	@Test
-	public void customized_comparision_test_classes_should_insert_data_using_customized_approach() throws Throwable {
-		
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, abstractCustomizableDatabaseOperation)).thenReturn(
-				loadStrategyOperation);
-		
-		FrameworkMethod frameworkMethod = frameworkMethod(MyTestWithCustomComparisionStrategy.class, "my_unknown_test");
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
-		
-		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
-		doReturn(abstractCustomizableDatabaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(abstractCustomizableDatabaseOperation);
-		
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+        InputStream isContent = streamCaptor.getValue();
+        scriptContent = IOUtils.readFullStream(isContent);
+        assertThat(scriptContent, is("Default Class Name Strategy"));
 
-		abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestWithCustomComparisionStrategy()).evaluate();
-		
-		verify(abstractCustomizableDatabaseOperation, times(1)).setComparisonStrategy(any(ComparisonStrategy.class));
-		
-	}
-	
-	@Test
-	public void customized_insertation_test_classes_should_insert_data_using_customized_approach() throws Throwable {
-		
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, abstractCustomizableDatabaseOperation)).thenReturn(
-				loadStrategyOperation);
-		
-		FrameworkMethod frameworkMethod = frameworkMethod(MyTestWithCustomInsertStrategy.class, "my_unknown_test");
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
-		
-		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
-		doReturn(abstractCustomizableDatabaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(abstractCustomizableDatabaseOperation);
-		
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+    }
 
-		abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestWithCustomInsertStrategy()).evaluate();
-		
-		verify(abstractCustomizableDatabaseOperation, times(1)).setInsertionStrategy(any(InsertionStrategy.class));
-		
-	}
-	
-	@Test
-	public void annotated_methods_without_locations_should_use_method_name_approach() throws Throwable {
+    @Test
+    public void customized_comparision_test_classes_should_insert_data_using_customized_approach() throws Throwable {
 
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
-				loadStrategyOperation);
+        when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, abstractCustomizableDatabaseOperation)).thenReturn(
+                loadStrategyOperation);
 
-		FrameworkMethod frameworkMethod = frameworkMethod(MyTestMethodClass.class, "my_method_test");
+        FrameworkMethod frameworkMethod = frameworkMethod(MyTestWithCustomComparisionStrategy.class, "my_unknown_test");
+        AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
 
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+        doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+        doReturn(abstractCustomizableDatabaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+        when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(abstractCustomizableDatabaseOperation);
 
-		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
-		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+        abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+        abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+        abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestWithCustomComparisionStrategy()).evaluate();
 
-		abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestMethodClass()).evaluate();
+        verify(abstractCustomizableDatabaseOperation, times(1)).setComparisonStrategy(any(ComparisonStrategy.class));
 
-		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
-		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+    }
 
-		verify(loadStrategyOperation, times(1)).executeScripts(streamsCaptor.capture());
+    @Test
+    public void customized_insertation_test_classes_should_insert_data_using_customized_approach() throws Throwable {
 
-		InputStream[] isContents = streamsCaptor.getValue();
-		String scriptContent = IOUtils.readFullStream(isContents[0]);
-		assertThat(scriptContent, is("Default Method Name Strategy"));
+        when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, abstractCustomizableDatabaseOperation)).thenReturn(
+                loadStrategyOperation);
 
-		verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
+        FrameworkMethod frameworkMethod = frameworkMethod(MyTestWithCustomInsertStrategy.class, "my_unknown_test");
+        AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
 
-		InputStream isContent = streamCaptor.getValue();
-		scriptContent = IOUtils.readFullStream(isContent);
-		assertThat(scriptContent, is("Default Method Name Strategy"));
+        doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+        doReturn(abstractCustomizableDatabaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+        when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(abstractCustomizableDatabaseOperation);
 
-	}
+        abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+        abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-	@Test
-	public void annotated_methods_should_have_precedence_over_annotated_class() throws Throwable {
+        abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestWithCustomInsertStrategy()).evaluate();
 
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
-				loadStrategyOperation);
+        verify(abstractCustomizableDatabaseOperation, times(1)).setInsertionStrategy(any(InsertionStrategy.class));
 
-		FrameworkMethod frameworkMethod = frameworkMethod(DefaultClass.class, "my_method_test");
+    }
 
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+    @Test
+    public void annotated_methods_without_locations_should_use_method_name_approach() throws Throwable {
 
-		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+        when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
+                loadStrategyOperation);
 
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+        FrameworkMethod frameworkMethod = frameworkMethod(MyTestMethodClass.class, "my_method_test");
 
-		abstractNoSqlTestRule.apply(base, frameworkMethod, new DefaultClass()).evaluate();
+        AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
 
-		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
-		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+        doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+        doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+        when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 
-		verify(loadStrategyOperation, times(1)).executeScripts(streamsCaptor.capture());
+        abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+        abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		InputStream[] isContents = streamsCaptor.getValue();
-		String scriptContent = IOUtils.readFullStream(isContents[0]);
-		assertThat(scriptContent, is("Method Annotation"));
+        abstractNoSqlTestRule.apply(base, frameworkMethod, new MyTestMethodClass()).evaluate();
 
-		verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
+        ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
+        ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
 
-		InputStream isContent = streamCaptor.getValue();
-		scriptContent = IOUtils.readFullStream(isContent);
-		assertThat(scriptContent, is("Method Annotation"));
+        verify(loadStrategyOperation, times(1)).executeScripts(streamsCaptor.capture());
 
-	}
+        InputStream[] isContents = streamsCaptor.getValue();
+        String scriptContent = IOUtils.readFullStream(isContents[0]);
+        assertThat(scriptContent, is("Default Method Name Strategy"));
 
-	@Test
-	public void class_annotation_should_be_used_if_no_annotated_methods() throws Throwable {
+        verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
 
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
-				loadStrategyOperation);
+        InputStream isContent = streamCaptor.getValue();
+        scriptContent = IOUtils.readFullStream(isContent);
+        assertThat(scriptContent, is("Default Method Name Strategy"));
 
-		FrameworkMethod frameworkMethod = frameworkMethod(DefaultClass.class, "my_unknown_test_2");
+    }
 
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+    @Test
+    public void annotated_methods_should_have_precedence_over_annotated_class() throws Throwable {
 
-		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+        when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
+                loadStrategyOperation);
 
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+        FrameworkMethod frameworkMethod = frameworkMethod(DefaultClass.class, "my_method_test");
 
-		abstractNoSqlTestRule.apply(base, frameworkMethod, new DefaultClass()).evaluate();
+        AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
 
-		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
-		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+        doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+        when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 
-		verify(loadStrategyOperation, times(1)).executeScripts(streamsCaptor.capture());
+        abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+        abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		InputStream[] isContents = streamsCaptor.getValue();
-		String scriptContent = IOUtils.readFullStream(isContents[0]);
-		assertThat(scriptContent, is("Class Annotation"));
+        abstractNoSqlTestRule.apply(base, frameworkMethod, new DefaultClass()).evaluate();
 
-		verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
+        ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
+        ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
 
-		InputStream isContent = streamCaptor.getValue();
-		scriptContent = IOUtils.readFullStream(isContent);
-		assertThat(scriptContent, is("Method Annotation"));
+        verify(loadStrategyOperation, times(1)).executeScripts(streamsCaptor.capture());
 
-	}
+        InputStream[] isContents = streamsCaptor.getValue();
+        String scriptContent = IOUtils.readFullStream(isContents[0]);
+        assertThat(scriptContent, is("Method Annotation"));
 
-	@Test
-	public void class_annotation_should_be_used_if_any_annotated_methods() throws Throwable {
+        verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
 
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
-				loadStrategyOperation);
+        InputStream isContent = streamCaptor.getValue();
+        scriptContent = IOUtils.readFullStream(isContent);
+        assertThat(scriptContent, is("Method Annotation"));
 
-		FrameworkMethod frameworkMethod = frameworkMethod(DefaultClass.class, "my_unknown_test");
+    }
 
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+    @Test
+    public void class_annotation_should_be_used_if_no_annotated_methods() throws Throwable {
 
-		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+        when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
+                loadStrategyOperation);
 
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+        FrameworkMethod frameworkMethod = frameworkMethod(DefaultClass.class, "my_unknown_test_2");
 
-		abstractNoSqlTestRule.apply(base, frameworkMethod, new DefaultClass()).evaluate();
+        AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
 
-		ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
-		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+        doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+        when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 
-		verify(loadStrategyOperation, times(1)).executeScripts(streamsCaptor.capture());
+        abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+        abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		InputStream[] isContents = streamsCaptor.getValue();
-		String scriptContent = IOUtils.readFullStream(isContents[0]);
-		assertThat(scriptContent, is("Class Annotation"));
+        abstractNoSqlTestRule.apply(base, frameworkMethod, new DefaultClass()).evaluate();
 
-		verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
+        ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
+        ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
 
-		InputStream isContent = streamCaptor.getValue();
-		scriptContent = IOUtils.readFullStream(isContent);
-		assertThat(scriptContent, is("Class Annotation"));
+        verify(loadStrategyOperation, times(1)).executeScripts(streamsCaptor.capture());
 
-	}
+        InputStream[] isContents = streamsCaptor.getValue();
+        String scriptContent = IOUtils.readFullStream(isContents[0]);
+        assertThat(scriptContent, is("Class Annotation"));
 
-	@Test
-	public void selective_matchers_annotation_should_only_verify_identified_connection() throws Throwable {
+        verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
 
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
-				loadStrategyOperation);
+        InputStream isContent = streamCaptor.getValue();
+        scriptContent = IOUtils.readFullStream(isContent);
+        assertThat(scriptContent, is("Method Annotation"));
 
-		FrameworkMethod frameworkMethod = frameworkMethod(SelectiveDefaultClass.class, "my_unknown_test");
+    }
 
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+    @Test
+    public void class_annotation_should_be_used_if_any_annotated_methods() throws Throwable {
 
-		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		abstractNoSqlTestRule.setIdentifier("one");
+        when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
+                loadStrategyOperation);
 
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+        FrameworkMethod frameworkMethod = frameworkMethod(DefaultClass.class, "my_unknown_test");
 
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+        AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
 
-		abstractNoSqlTestRule.apply(base, frameworkMethod, new SelectiveDefaultClass()).evaluate();
+        doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+        when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 
-		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+        abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+        abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
+        abstractNoSqlTestRule.apply(base, frameworkMethod, new DefaultClass()).evaluate();
 
-		InputStream isContent = streamCaptor.getValue();
-		String scriptContent = IOUtils.readFullStream(isContent);
-		assertThat(scriptContent, is("Selective Annotation"));
+        ArgumentCaptor<InputStream[]> streamsCaptor = ArgumentCaptor.forClass(InputStream[].class);
+        ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
 
-	}
+        verify(loadStrategyOperation, times(1)).executeScripts(streamsCaptor.capture());
 
-	@Test(expected = IllegalArgumentException.class)
-	public void selective_matchers_annotation_should_fail_if_unknown_identified_connection() throws Throwable {
+        InputStream[] isContents = streamsCaptor.getValue();
+        String scriptContent = IOUtils.readFullStream(isContents[0]);
+        assertThat(scriptContent, is("Class Annotation"));
 
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
-				loadStrategyOperation);
+        verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
 
-		FrameworkMethod frameworkMethod = frameworkMethod(SelectiveDefaultClass.class, "my_unknown_test");
+        InputStream isContent = streamCaptor.getValue();
+        scriptContent = IOUtils.readFullStream(isContent);
+        assertThat(scriptContent, is("Class Annotation"));
 
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+    }
 
-		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
-		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		abstractNoSqlTestRule.setIdentifier("two");
+    @Test
+    public void selective_matchers_annotation_should_only_verify_identified_connection() throws Throwable {
 
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+        when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
+                loadStrategyOperation);
 
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+        FrameworkMethod frameworkMethod = frameworkMethod(SelectiveDefaultClass.class, "my_unknown_test");
 
-		abstractNoSqlTestRule.apply(base, frameworkMethod, new SelectiveDefaultClass()).evaluate();
-		fail();
+        AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
 
-	}
+        doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+        abstractNoSqlTestRule.setIdentifier("one");
 
-	@Test
-	public void global_location_should_have_precedence_over_selective_matchers() throws Throwable {
+        when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
-				loadStrategyOperation);
+        abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+        abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		FrameworkMethod frameworkMethod = frameworkMethod(SelectiveAndLocationClass.class, "my_unknown_test");
+        abstractNoSqlTestRule.apply(base, frameworkMethod, new SelectiveDefaultClass()).evaluate();
 
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+        ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
 
-		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		abstractNoSqlTestRule.setIdentifier("one");
+        verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
 
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+        InputStream isContent = streamCaptor.getValue();
+        String scriptContent = IOUtils.readFullStream(isContent);
+        assertThat(scriptContent, is("Selective Annotation"));
 
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+    }
 
-		abstractNoSqlTestRule.apply(base, frameworkMethod, new SelectiveAndLocationClass()).evaluate();
+    @Test(expected = IllegalArgumentException.class)
+    public void selective_matchers_annotation_should_fail_if_unknown_identified_connection() throws Throwable {
 
-		ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+        when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
+                loadStrategyOperation);
 
-		verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
+        FrameworkMethod frameworkMethod = frameworkMethod(SelectiveDefaultClass.class, "my_unknown_test");
 
-		InputStream isContent = streamCaptor.getValue();
-		String scriptContent = IOUtils.readFullStream(isContent);
-		assertThat(scriptContent, is("Class Annotation"));
+        AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
 
-	}
+        doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+        doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+        abstractNoSqlTestRule.setIdentifier("two");
 
-	@Test
-	public void not_valid_locations_should_throw_an_exception() throws Throwable {
+        when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 
-		when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
-				loadStrategyOperation);
+        abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+        abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-		FrameworkMethod frameworkMethod = frameworkMethod(MyUknownClass.class, "my_unknown_test");
+        abstractNoSqlTestRule.apply(base, frameworkMethod, new SelectiveDefaultClass()).evaluate();
+        fail();
 
-		AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+    }
 
-		doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
-		doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+    @Test
+    public void global_location_should_have_precedence_over_selective_matchers() throws Throwable {
 
-		when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+        when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
+                loadStrategyOperation);
 
-		abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
-		abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+        FrameworkMethod frameworkMethod = frameworkMethod(SelectiveAndLocationClass.class, "my_unknown_test");
 
-		try {
-			abstractNoSqlTestRule.apply(base, frameworkMethod, new MyUknownClass()).evaluate();
-			fail();
-		} catch (IllegalArgumentException e) {
-			assertThat(
-					e.getMessage(),
-					is("File specified in locations property are not present in classpath, or no files matching default name are found. Valid default locations are: /com/lordofthejars/nosqlunit/core/integration/MyUknownClass.json or /com/lordofthejars/nosqlunit/core/integration/MyUknownClass#my_unknown_test.json"));
-		}
+        AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
 
-	}
+        doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+        abstractNoSqlTestRule.setIdentifier("one");
 
-	private FrameworkMethod frameworkMethod(Class<?> testClass, String methodName) {
+        when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
 
-		try {
-			Method method = testClass.getMethod(methodName);
-			return new FrameworkMethod(method);
-		} catch (SecurityException e) {
-			throw new IllegalArgumentException(e);
-		} catch (NoSuchMethodException e) {
-			throw new IllegalArgumentException(e);
-		}
+        abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+        abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
 
-	}
+        abstractNoSqlTestRule.apply(base, frameworkMethod, new SelectiveAndLocationClass()).evaluate();
+
+        ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+
+        verify(databaseOperation, times(1)).databaseIs(streamCaptor.capture());
+
+        InputStream isContent = streamCaptor.getValue();
+        String scriptContent = IOUtils.readFullStream(isContent);
+        assertThat(scriptContent, is("Class Annotation"));
+
+    }
+
+    @Test
+    public void not_valid_locations_should_throw_an_exception() throws Throwable {
+
+        when(loadStrategyFactory.getLoadStrategyInstance(LoadStrategyEnum.INSERT, databaseOperation)).thenReturn(
+                loadStrategyOperation);
+
+        FrameworkMethod frameworkMethod = frameworkMethod(MyUknownClass.class, "my_unknown_test");
+
+        AbstractNoSqlTestRule abstractNoSqlTestRule = mock(AbstractNoSqlTestRule.class, Mockito.CALLS_REAL_METHODS);
+
+        doReturn(databaseOperation).when(abstractNoSqlTestRule).getDatabaseOperation();
+        doReturn("json").when(abstractNoSqlTestRule).getWorkingExtension();
+
+        when(abstractNoSqlTestRule.getDatabaseOperation()).thenReturn(databaseOperation);
+
+        abstractNoSqlTestRule.setLoadStrategyFactory(loadStrategyFactory);
+        abstractNoSqlTestRule.setInjectAnnotationProcessor(injectAnnotationProcessor);
+
+        try {
+            abstractNoSqlTestRule.apply(base, frameworkMethod, new MyUknownClass()).evaluate();
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertThat(
+                    e.getMessage(),
+                    is("File specified in locations property are not present in classpath, or no files matching default name are found. Valid default locations are: /com/lordofthejars/nosqlunit/core/integration/MyUknownClass.json or /com/lordofthejars/nosqlunit/core/integration/MyUknownClass#my_unknown_test.json"));
+        }
+
+    }
+
+    private FrameworkMethod frameworkMethod(Class<?> testClass, String methodName) {
+
+        try {
+            Method method = testClass.getMethod(methodName);
+            return new FrameworkMethod(method);
+        } catch (SecurityException e) {
+            throw new IllegalArgumentException(e);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException(e);
+        }
+
+    }
 
 }
+    @UsingDataSet(locations = "test2", loadStrategy = LoadStrategyEnum.INSERT)
+    @ShouldMatchDataSet(location = "test2")
+    @CustomComparisonStrategy(comparisonStrategy = MyCustomComparision.class)
+    class MyTestWithCustomComparisionStrategy {
 
-@UsingDataSet(locations = "test2", loadStrategy=LoadStrategyEnum.INSERT)
-@ShouldMatchDataSet(location = "test2")
-@CustomComparisonStrategy(comparisonStrategy=MyCustomComparision.class)
-class MyTestWithCustomComparisionStrategy {
-	
-	@Test
-	public void my_unknown_test() {
-		
-	}
-}
+        @Test
+        public void my_unknown_test() {
 
-@UsingDataSet(locations = "test2", loadStrategy=LoadStrategyEnum.INSERT)
-@CustomInsertionStrategy(insertionStrategy=MyCustomInsertation.class)
-class MyTestWithCustomInsertStrategy {
-	
-	@Test
-	public void my_unknown_test() {
-		
-	}
-}
+        }
+    }
 
-@UsingDataSet(locations = "test2", withSelectiveLocations = { @Selective(identifier = "one", locations = "test3") }, loadStrategy = LoadStrategyEnum.INSERT)
-class MyGlobalAndSelectiveClass {
+    @UsingDataSet(locations = "test2", loadStrategy = LoadStrategyEnum.INSERT)
+    @CustomInsertionStrategy(insertionStrategy = MyCustomInsertation.class)
+    class MyTestWithCustomInsertStrategy {
 
-	@Test
-	public void my_unknown_test() {
-	}
+        @Test
+        public void my_unknown_test() {
 
-}
+        }
+    }
 
-@UsingDataSet(withSelectiveLocations = { @Selective(identifier = "one", locations = "test3") }, loadStrategy = LoadStrategyEnum.INSERT)
-class MySelectiveClass {
+    @UsingDataSet(locations = "test2", withSelectiveLocations = {@Selective(identifier = "one", locations = "test3")}, loadStrategy = LoadStrategyEnum.INSERT)
+    class MyGlobalAndSelectiveClass {
 
-	@Test
-	public void my_unknown_test() {
-	}
+        @Test
+        public void my_unknown_test() {
+        }
 
-}
+    }
 
-@UsingDataSet(loadStrategy = LoadStrategyEnum.INSERT)
-class MyTestClass {
+    @UsingDataSet(withSelectiveLocations = {@Selective(identifier = "one", locations = "test3")}, loadStrategy = LoadStrategyEnum.INSERT)
+    class MySelectiveClass {
 
-	@Test
-	@ShouldMatchDataSet()
-	public void my_unknown_test() {
-	}
+        @Test
+        public void my_unknown_test() {
+        }
 
-}
+    }
 
-class MyTestMethodClass {
-	@UsingDataSet(loadStrategy = LoadStrategyEnum.INSERT)
-	@Test
-	@ShouldMatchDataSet()
-	public void my_unknown_test() {
-	}
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.INSERT)
+    class MyTestClass {
 
-	@UsingDataSet(loadStrategy = LoadStrategyEnum.INSERT)
-	@Test
-	@ShouldMatchDataSet()
-	public void my_method_test() {
-	}
-}
+        @Test
+        @ShouldMatchDataSet()
+        public void my_unknown_test() {
+        }
 
-@UsingDataSet(loadStrategy = LoadStrategyEnum.INSERT)
-class MyUknownClass {
+    }
 
-	@Test
-	public void my_unknown_test() {
-	}
+    class MyTestMethodClass {
+        @UsingDataSet(loadStrategy = LoadStrategyEnum.INSERT)
+        @Test
+        @ShouldMatchDataSet()
+        public void my_unknown_test() {
+        }
 
-}
+        @UsingDataSet(loadStrategy = LoadStrategyEnum.INSERT)
+        @Test
+        @ShouldMatchDataSet()
+        public void my_method_test() {
+        }
+    }
 
-@UsingDataSet(locations = "test2", loadStrategy = LoadStrategyEnum.INSERT)
-@ShouldMatchDataSet(location = "test2")
-class DefaultClass {
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.INSERT)
+    class MyUknownClass {
 
-	@Test
-	public void my_unknown_test() {
-	}
+        @Test
+        public void my_unknown_test() {
+        }
 
-	@Test
-	@ShouldMatchDataSet(location = "test")
-	public void my_unknown_test_2() {
-	}
+    }
 
-	@Test
-	@UsingDataSet(locations = "test", loadStrategy = LoadStrategyEnum.INSERT)
-	@ShouldMatchDataSet(location = "test")
-	public void my_method_test() {
-	}
+    @UsingDataSet(locations = "test2", loadStrategy = LoadStrategyEnum.INSERT)
+    @ShouldMatchDataSet(location = "test2")
+    class DefaultClass {
 
-}
+        @Test
+        public void my_unknown_test() {
+        }
 
-@ShouldMatchDataSet(withSelectiveMatcher = { @SelectiveMatcher(identifier = "one", location = "test3") })
-class SelectiveDefaultClass {
+        @Test
+        @ShouldMatchDataSet(location = "test")
+        public void my_unknown_test_2() {
+        }
 
-	@Test
-	public void my_unknown_test() {
-	}
+        @Test
+        @UsingDataSet(locations = "test", loadStrategy = LoadStrategyEnum.INSERT)
+        @ShouldMatchDataSet(location = "test")
+        public void my_method_test() {
+        }
 
-}
+    }
 
-@ShouldMatchDataSet(location = "test2", withSelectiveMatcher = { @SelectiveMatcher(identifier = "one", location = "test3") })
-class SelectiveAndLocationClass {
+    @ShouldMatchDataSet(withSelectiveMatcher = {@SelectiveMatcher(identifier = "one", location = "test3")})
+    class SelectiveDefaultClass {
 
-	@Test
-	public void my_unknown_test() {
-	}
+        @Test
+        public void my_unknown_test() {
+        }
 
-}
+    }
+
+    @ShouldMatchDataSet(location = "test2", withSelectiveMatcher = {@SelectiveMatcher(identifier = "one", location = "test3")})
+    class SelectiveAndLocationClass {
+
+        @Test
+        public void my_unknown_test() {
+        }
+
+    }
+

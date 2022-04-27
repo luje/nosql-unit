@@ -24,7 +24,7 @@ import com.lordofthejars.nosqlunit.mongodb.shard.ShardedManagedMongoDb;
 public class WhenShardingIsRequired {
 
 	static {
-		System.setProperty("MONGO_HOME", "/opt/mongo");
+		System.setProperty("MONGO_HOME", "d:\\opt\\mongo");
 	}
 
 	@ClassRule

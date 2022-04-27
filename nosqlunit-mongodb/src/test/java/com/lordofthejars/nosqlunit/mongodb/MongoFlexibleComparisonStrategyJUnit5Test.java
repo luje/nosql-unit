@@ -4,21 +4,20 @@ import com.lordofthejars.nosqlunit.annotation.CustomComparisonStrategy;
 import com.lordofthejars.nosqlunit.annotation.IgnorePropertyValue;
 import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
-import static com.lordofthejars.nosqlunit.mongodb.MongoDbRule.MongoDbRuleBuilder.newMongoDbRule;
+import static com.lordofthejars.nosqlunit.mongodb.MongoDbExtension.MongoDbExtensionBuilder.newMongoDbExtension;
 
 @CustomComparisonStrategy(comparisonStrategy = MongoFlexibleComparisonStrategy.class)
-public class MongoFlexibleComparisonStrategyTest {
+public class MongoFlexibleComparisonStrategyJUnit5Test {
 
-    @ClassRule
-    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
+    @RegisterExtension
+    static InMemoryMongoDb.InMemoryMongoDbExtension mongoDbExtension = new InMemoryMongoDb.InMemoryMongoDbExtension(newInMemoryMongoDbRule().build());
 
-    @Rule
-    public MongoDbRule mongoDbRule = newMongoDbRule().defaultEmbeddedMongoDb("test");
+    @RegisterExtension
+    MongoDbExtension mongoDbRule = newMongoDbExtension().defaultEmbeddedMongoDb("test");
 
     @Test
     @UsingDataSet(locations = "MongoFlexibleComparisonStrategyTest#thatShowWarnings.json")

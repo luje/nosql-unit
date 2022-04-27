@@ -7,9 +7,9 @@ import java.util.List;
 
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

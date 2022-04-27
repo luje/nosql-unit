@@ -16,7 +16,7 @@ import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
 public class WhenMultipleMongoObjectsAreAnnotatedWithInject {
 
 //	@ClassRule
-//	public static ManagedMongoDb managedMongoDb1 = newManagedMongoDbRule().mongodPath("/opt/mongo")
+//	public static ManagedMongoDb managedMongoDb1 = newManagedMongoDbRule().mongodPath("d:\\opt\\mongo")
 //			.build();
 	
 	@Rule

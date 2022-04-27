@@ -264,9 +264,9 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
                     final String suffix = EXPECTED_RESERVED_WORD + "."
                             + getWorkingExtension();
                     final String defaultClassLocation = DefaultClasspathLocationBuilder
-                            .defaultClassAnnotatedClasspathLocation(method);
+                            .defaultClassAnnotatedClasspathLocation(method.getMethod());
                     final String defaultMethodLocation = DefaultClasspathLocationBuilder
-                            .defaultMethodAnnotatedClasspathLocation(method,
+                            .defaultMethodAnnotatedClasspathLocation(method.getMethod(),
                                     defaultClassLocation, suffix);
 
                     throw new IllegalArgumentException(
@@ -317,7 +317,7 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
                         .filter(it -> Objects.equals(identifier, it.identifier()))
                         .filter(it -> Objects.nonNull(it.identifier()))
                         .findFirst()
-                        .get();
+                        .orElse(null);
             }
 
             private InputStream loadExpectedResultFromDefaultLocation(
@@ -328,7 +328,7 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 
                 String defaultLocation = defaultDataSetLocationResolver
                         .resolveDefaultDataSetLocation(shouldMatchDataSet,
-                                method, EXPECTED_RESERVED_WORD + "."
+                                method.getMethod(), EXPECTED_RESERVED_WORD + "."
                                         + getWorkingExtension());
 
                 if (defaultLocation != null) {
@@ -359,9 +359,9 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
                                 .withSelectiveLocations())) {
                     final String suffix = "." + getWorkingExtension();
                     final String defaultClassLocation = DefaultClasspathLocationBuilder
-                            .defaultClassAnnotatedClasspathLocation(method);
+                            .defaultClassAnnotatedClasspathLocation(method.getMethod());
                     final String defaultMethodLocation = DefaultClasspathLocationBuilder
-                            .defaultMethodAnnotatedClasspathLocation(method,
+                            .defaultMethodAnnotatedClasspathLocation(method.getMethod(),
                                     defaultClassLocation, suffix);
                     throw new IllegalArgumentException(
                             "File specified in locations property are not present in classpath, or no files matching default name are found. Valid default locations are: "
@@ -451,7 +451,7 @@ public abstract class AbstractNoSqlTestRule implements MethodRule {
 
                     String location = defaultDataSetLocationResolver
                             .resolveDefaultDataSetLocation(usingDataSet,
-                                    method, "." + getWorkingExtension());
+                                    method.getMethod(), "." + getWorkingExtension());
 
                     if (location != null) {
                         scriptContent.add(IOUtils

@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SpringEmbeddedInstanceBase.EmbeddedMongoConfiguration.class)
-public class WhenSpringEmbeddedInstanceIsRequired extends SpringEmbeddedInstanceBase{
+public class WhenSpringEmbeddedInstanceIsRequired extends SpringEmbeddedInstanceBase {
 
 	@Test
 	public void connection_manager_should_be_the_one_defined_in_application_context() {

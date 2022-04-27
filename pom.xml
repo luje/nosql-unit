@@ -40,7 +40,7 @@
         <elasticsearch2.version>2.0.2</elasticsearch2.version>
         <junit.version>4.12</junit.version>
         <hamcrest.version>2.2</hamcrest.version>
-        <mockito.version>1.9.0</mockito.version>
+        <mockito.version>4.4.0</mockito.version>
         <slf4j.version>1.7.5</slf4j.version>
         <logback.version>1.0.11</logback.version>
         <neo4j.version>2.3.3</neo4j.version>
@@ -323,6 +323,26 @@
             </exclusions>
         </dependency>
 
+	    <dependency>
+		    <groupId>org.junit.jupiter</groupId>
+		    <artifactId>junit-jupiter-engine</artifactId>
+		    <version>5.8.2</version>
+		    <scope>provided</scope>
+		    <exclusions>
+			    <exclusion>
+				    <groupId>org.hamcrest</groupId>
+				    <artifactId>hamcrest-core</artifactId>
+			    </exclusion>
+		    </exclusions>
+	    </dependency>
+
+	    <dependency>
+		    <groupId>org.junit.jupiter</groupId>
+		    <artifactId>junit-jupiter-migrationsupport</artifactId>
+		    <version>5.8.2</version>
+		    <scope>test</scope>
+	    </dependency>
+
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-core</artifactId>
@@ -331,7 +351,7 @@
 
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
+            <artifactId>mockito-core</artifactId>
             <version>${mockito.version}</version>
             <scope>test</scope>
             <exclusions>

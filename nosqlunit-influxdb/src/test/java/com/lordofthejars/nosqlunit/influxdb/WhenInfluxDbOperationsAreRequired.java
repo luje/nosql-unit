@@ -3,7 +3,7 @@ package com.lordofthejars.nosqlunit.influxdb;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
